@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Security Finding Event v1",
+  "type": "object",
+  "required": [
+    "schema_urn",
+    "finding_id",
+    "severity",
+    "classification",
+    "detected_at",
+    "resource",
+    "policy_id",
+    "tenant_id",
+    "trace_id",
+    "metadata"
+  ],
+  "properties": {
+    "schema_urn": {
+      "const": "urn:nc:schema:security:finding:event.security.finding.v1"
+    },
+    "finding_id": {
+      "type": "string",
+      "pattern": "^fin_[0-9A-Za-z]{10,}$"
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["low", "medium", "high", "critical"]
+    },
+    "classification": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "detected_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "resource": {
+      "type": "object",
+      "required": ["type", "arn"],
+      "properties": {
+        "type": {"type": "string"},
+        "arn": {"type": "string"}
+      }
+    },
+    "policy_id": {
+      "type": "string"
+    },
+    "tenant_id": {
+      "type": "string"
+    },
+    "trace_id": {
+      "type": "string"
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "examples": [
+    {
+      "schema_urn": "urn:nc:schema:security:finding:event.security.finding.v1",
+      "finding_id": "fin_01J0ABC7Z9M5P6Q7R8S9",
+      "severity": "high",
+      "classification": ["pii", "exfil-risk"],
+      "detected_at": "2025-01-20T12:45:13Z",
+      "resource": {
+        "type": "s3_object",
+        "arn": "arn:aws:s3:::nc-dp-raw/sourceA/2025/01/20/doc-123.bin"
+      },
+      "policy_id": "POL-PII-007",
+      "tenant_id": "tn_01HZY3",
+      "trace_id": "01J0AEH4M4Z9N3QX7TB6",
+      "evidence": {
+        "checksum": "sha256:abc...",
+        "pii_types": ["ssn", "dob"]
+      },
+      "metadata": {
+        "pipeline_stage": "normalize",
+        "source": "ingest.webhook"
+      }
+    }
+  ]
+}

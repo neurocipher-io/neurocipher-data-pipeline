@@ -1,0 +1,4 @@
+extends: spectral:oas
+rules:
+  operation-operationId-unique: error
+  info-contact: off

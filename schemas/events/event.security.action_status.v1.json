@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Security Action Status Event v1",
+  "type": "object",
+  "required": [
+    "schema_urn",
+    "action_id",
+    "status_id",
+    "status",
+    "observed_at",
+    "retriable"
+  ],
+  "properties": {
+    "schema_urn": {
+      "const": "urn:nc:schema:security:status:event.security.action_status.v1"
+    },
+    "action_id": {
+      "type": "string",
+      "pattern": "^act_[0-9A-Za-z]{10,}$"
+    },
+    "status_id": {
+      "type": "string",
+      "pattern": "^ast_[0-9A-Za-z]{10,}$"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["queued", "running", "succeeded", "failed"]
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "retriable": {
+      "type": "boolean"
+    },
+    "details": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "trace_id": {"type": "string"}
+  },
+  "examples": [
+    {
+      "schema_urn": "urn:nc:schema:security:status:event.security.action_status.v1",
+      "action_id": "act_01J0AH1VB5M2R4S6T8",
+      "status_id": "ast_01J0AHGDX5R3S6T9",
+      "status": "succeeded",
+      "observed_at": "2025-01-20T12:46:20Z",
+      "retriable": false,
+      "details": {
+        "message": "Document quarantined and downstream copies flagged",
+        "duration_ms": 18000
+      },
+      "trace_id": "01J0AEH4M4Z9N3QX7TB6"
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+# Document ID: SVC-001
+**Title:** Online Serving Contract Overview  
+**Status:** Draft v0.1  
+**Owner:** platform-serving  
+**Last Reviewed:** 2025-11-09  
+**References:** SVC-001-Online-Serving-Contract-Specification.md, SRG-001, DCON-001, OBS-002
+
+---
+
+## 1. Purpose
+Summarize the enforceable contract for real-time query endpoints (Weaviate, OpenSearch, GraphQL gateway) and provide a quick reference for contributors implementing or modifying online serving components.
+
+## 2. Interface Matrix
+| Interface | Protocol | Versioning | Schema Source | Notes |
+|-----------|----------|------------|---------------|-------|
+| Weaviate Semantic Search | REST / GraphQL | URL versioned (`/v2`) | `schemas/openapi/weaviate-online.yaml` | Embedding + hybrid queries |
+| OpenSearch Metadata API | REST | Index alias per SemVer (`discovery_v1`) | `schemas/openapi/opensearch-online.yaml` | Supports filterable facets |
+| Query GraphQL Gateway | GraphQL | SDL tagged via git SHA | `schemas/openapi/query-gateway.graphql` | Aggregates RDS lookup |
+| Inference Microservice | REST POST | `/v1/embed` | `schemas/openapi/embed.yaml` | Auth via SigV4-only |
+
+## 3. Sample Endpoints & Payloads
+```http
+POST https://api.neurocipher.dev/v2/search
+Authorization: SIGV4 <signature>
+Content-Type: application/json
+
+{
+  "query": "neuro rehab",
+  "tenant_id": "acme-prod",
+  "limit": 5,
+  "filters": {"modality": ["eeg"]}
+}
+```
+
+```graphql
+query PatientSnapshot($tenant: ID!, $id: ID!) {
+  patient(tenantId: $tenant, id: $id) {
+    id
+    latestEmbedding(version: "v2")
+    metadata {
+      diagnosis
+      updatedAt
+    }
+  }
+}
+```
+
+## 4. Versioning Policy
+| Surface | Current Version | Promotion Rule | Sunset Window |
+|---------|-----------------|----------------|---------------|
+| REST Search (`/search`) | `v2` | Promote after dual-write + 2 successful load tests | 90 days after announcing `v3` |
+| GraphQL Gateway | `2025.10` SDL tag | Promote via schema registry approval + contract tests | 60 days after publishing new tag |
+| Inference API (`/v1/embed`) | `v1` | Promote with model rollout RFC + canary traffic | Old version disabled 30 days post rollout |
+| OpenSearch Metadata | `discovery_v1` alias | Promote by creating `discovery_v2` alias and backfill | 45 days before alias removal |
+
+## 5. Contract Guardrails
+- All endpoints must emit OpenAPI/SDL artifacts stored in git and published through SRG-001 automation.  
+- Backward-incompatible changes require new URL/version plus migration plan documented in ADR.  
+- Auth: SigV4 + IAM for internal, OAuth for partner-facing; never mix across stages.  
+- Payload size hard limit 2 MB; reject larger requests with `413 Payload Too Large`.
+
+## 6. Observability & SLOs
+- Availability ≥ 99.9%, p95 latency < 250 ms (search) / < 400 ms (hybrid).  
+- Log every request ID + tenant for traceability; propagate headers (`x-nc-request-id`).  
+- Alerts link to RB-API-002 and RB-VEC-003 for remediation.
+
+## 7. Validation Workflow
+1. Update schema → run `npm run spectral`.  
+2. Execute `make test` (ensures contract tests under `services/query-api/tests/contracts`).  
+3. Provide changelog entry referencing Jira + consumer teams.  
+4. Obtain approvals from platform-serving owner plus impacted service owners (ops/owners.yaml).
+
+## 8. Change Log
+| Version | Date | Summary |
+|---------|------|---------|
+| v0.1 | 2025-11-09 | Initial digest derived from SVC-001 specification |

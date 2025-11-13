@@ -1,0 +1,91 @@
+version: 1.0
+project: neurocipher-data-pipeline
+scope:
+  include:
+    - "docs/**"
+    - "schemas/**"
+    - "ops/**"
+    - "iac/**"
+    - "openapi.yaml"
+    - ".spectral.yaml"
+  exclude:
+    - "**/.env"
+    - "**/*secrets*"
+    - "**/.aws/**"
+constants_ref: "docs/REF-002-Platform-Constants.md"
+
+rules:
+  naming:
+    pattern: kebab-case
+    forbid_chars: [" ", "&", "—"]
+  banned_terms:
+    allow_in: ["docs/integrations/**"]
+    terms: ["Nexis", "Agent Forge"]
+  front_matter_required: ["id", "title", "owner", "status", "last_reviewed"]
+  security_engine_contracts:
+    must_exist:
+      - "schemas/events/event.security.finding.v1.json"
+      - "schemas/events/cmd.security.quarantine.v1.json"
+      - "schemas/events/event.security.action_status.v1.json"
+
+validation:
+  openapi:
+    command: "echo 'spectral lint skipped in sandbox; runs via CI workflow'"
+    fallback: "echo 'no fallback; run spectral in CI'"
+  markdown:
+    command: "markdownlint docs AGENTS.md"
+  links:
+    command: "echo 'link check skipped in sandbox; runs via CI workflow'"
+  front_matter_check:
+    command: "rg -n '^(id|title|owner|status|last_reviewed):' docs | wc -l"
+  banned_terms_check:
+    command: "rg -n 'Nexis|Agent Forge' docs | sed -n '1,5p'"
+  filename_hygiene:
+    command: "rg -n '[—&()]' -g '!schemas/**' docs | sed -n '1,5p'"
+
+approvals:
+  auto_edit:
+    - "docs/**"
+    - "schemas/**"
+    - "ops/**"
+  require:
+    delete: ["**"]
+    ci_change: [".github/workflows/**"]
+    merge_main: ["true"]
+    rebase: ["true"]
+    force_push: ["true"]
+  forbid:
+    - "secrets"
+    - ".aws/**"
+
+tasks:
+  build_docs:
+    - "ensure docs/runbooks/ exists"
+    - "generate docs/runbooks/RB-*.md stubs"
+    - "generate docs/dr/DR-001-Disaster-Recovery-Plan.md"
+    - "generate docs/serving/SVC-001-Online-Serving-Contract.md"
+    - "generate docs/serving/SVC-002-Offline-Export-Contract.md"
+  contracts:
+    - "ensure schemas/events/*.v1.json exist with $schema, $id, title, examples"
+  normalize:
+    - "rename files to kebab-case"
+    - "fix internal links"
+  lint_all:
+    - "validation.openapi"
+    - "validation.markdown"
+    - "validation.links"
+  commit_all:
+    command: "git add -A && git commit -m 'docs: automated update by Codex (policy-compliant)'"
+
+ci_requirements:
+  workflows_must_exist:
+    - ".github/workflows/openapi-lint.yml"
+  pr_checks:
+    - "Spectral"
+    - "Markdownlint"
+    - "LinkCheck"
+
+owners:
+  platform_engineering: "platform@neurocipher.io"
+  sre: "sre@neurocipher.io"
+  security_engineering: "security@neurocipher.io"

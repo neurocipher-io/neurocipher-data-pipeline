@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Security Anomaly Event v1",
+  "type": "object",
+  "required": [
+    "schema_urn",
+    "anomaly_id",
+    "score",
+    "signal_type",
+    "observed_at",
+    "tenant_id",
+    "trace_id"
+  ],
+  "properties": {
+    "schema_urn": {
+      "const": "urn:nc:schema:security:anomaly:event.security.anomaly.v1"
+    },
+    "anomaly_id": {
+      "type": "string",
+      "pattern": "^anm_[0-9A-Za-z]{10,}$"
+    },
+    "score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "signal_type": {
+      "type": "string"
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "tenant_id": {
+      "type": "string"
+    },
+    "trace_id": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "examples": [
+    {
+      "schema_urn": "urn:nc:schema:security:anomaly:event.security.anomaly.v1",
+      "anomaly_id": "anm_01J0B3EVXT6",
+      "score": 0.87,
+      "signal_type": "vector-drift",
+      "observed_at": "2025-01-20T12:42:10Z",
+      "tenant_id": "tn_01HZY3",
+      "trace_id": "01J0AEH4M4Z9N3QX7TB6",
+      "tags": ["embedding", "drift"],
+      "context": {
+        "baseline_version": "embed-v9",
+        "current_version": "embed-v11"
+      }
+    }
+  ]
+}

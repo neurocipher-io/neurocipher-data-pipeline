@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Security Command - Ticket Create v1",
+  "type": "object",
+  "required": [
+    "schema_urn",
+    "action_id",
+    "ticket_system",
+    "payload",
+    "requested_by",
+    "requested_at"
+  ],
+  "properties": {
+    "schema_urn": {
+      "const": "urn:nc:schema:security:command:cmd.security.ticket.create.v1"
+    },
+    "action_id": {
+      "type": "string",
+      "pattern": "^act_[0-9A-Za-z]{10,}$"
+    },
+    "ticket_system": {"type": "string"},
+    "payload": {
+      "type": "object",
+      "required": ["summary", "description", "severity"],
+      "properties": {
+        "summary": {"type": "string"},
+        "description": {"type": "string"},
+        "severity": {"type": "string"}
+      }
+    },
+    "requested_by": {"type": "string"},
+    "requested_at": {"type": "string", "format": "date-time"},
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "examples": [
+    {
+      "schema_urn": "urn:nc:schema:security:command:cmd.security.ticket.create.v1",
+      "action_id": "act_01J0AJ6K95H3T7Y9Z1",
+      "ticket_system": "Jira",
+      "payload": {
+        "summary": "Quarantine doc_01HXYT",
+        "description": "PII policy violation detected. See finding fin_01J0ABC7...",
+        "severity": "high"
+      },
+      "requested_by": "seg_automation",
+      "requested_at": "2025-01-20T12:46:15Z",
+      "metadata": {
+        "tenant_id": "tn_01HZY3"
+      }
+    }
+  ]
+}

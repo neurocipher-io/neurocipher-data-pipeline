@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Security Command - Quarantine v1",
+  "type": "object",
+  "required": [
+    "schema_urn",
+    "action_id",
+    "target",
+    "requested_by",
+    "requested_at",
+    "reason"
+  ],
+  "properties": {
+    "schema_urn": {
+      "const": "urn:nc:schema:security:command:cmd.security.quarantine.v1"
+    },
+    "action_id": {
+      "type": "string",
+      "pattern": "^act_[0-9A-Za-z]{10,}$"
+    },
+    "target": {
+      "type": "object",
+      "required": ["type", "id"],
+      "properties": {
+        "type": {"type": "string"},
+        "id": {"type": "string"}
+      }
+    },
+    "requested_by": {"type": "string"},
+    "requested_at": {"type": "string", "format": "date-time"},
+    "reason": {"type": "string"},
+    "ttl_seconds": {"type": "integer", "minimum": 60},
+    "notify": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  },
+  "examples": [
+    {
+      "schema_urn": "urn:nc:schema:security:command:cmd.security.quarantine.v1",
+      "action_id": "act_01J0AH1VB5M2R4S6T8",
+      "target": {
+        "type": "document",
+        "id": "doc_01HXYT"
+      },
+      "requested_by": "seg_automation",
+      "requested_at": "2025-01-20T12:46:02Z",
+      "reason": "PII policy POL-PII-007 violation",
+      "ttl_seconds": 3600,
+      "notify": ["sec-ops@neurocipher.io"]
+    }
+  ]
+}

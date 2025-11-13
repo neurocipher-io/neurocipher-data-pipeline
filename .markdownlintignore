@@ -1,0 +1,6 @@
+docs/**
+!docs/runbooks/**
+!docs/dr/**
+!docs/serving/**
+!docs/ingestion/**
+!docs/security-engine/**

@@ -1,0 +1,24 @@
+ingest_api:
+  owner: platform-ingest
+  slack: "#ingest-alerts"
+  escalation: "pagerduty:ingest-api"
+
+normalize_service:
+  owner: platform-data
+  slack: "#normalize-alerts"
+  escalation: "pagerduty:normalize"
+
+embed_service:
+  owner: ml-platform
+  slack: "#embed-alerts"
+  escalation: "pagerduty:embed"
+
+query_api:
+  owner: platform-serving
+  slack: "#query-alerts"
+  escalation: "pagerduty:query"
+
+security_engine_interface:
+  owner: security-engineering
+  slack: "#security-engine"
+  escalation: "pagerduty:security-engine"

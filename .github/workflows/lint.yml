@@ -1,0 +1,21 @@
+name: Lint
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  openapi:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm i -g @stoplight/spectral-cli
+      - run: spectral lint -r spectral:oas openapi.yaml
+
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: lycheeverse/lychee-action@v1
+        with:
+          args: --no-progress --config .lychee.toml docs
