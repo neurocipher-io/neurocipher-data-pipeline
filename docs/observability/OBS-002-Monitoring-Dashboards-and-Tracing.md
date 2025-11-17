@@ -81,45 +81,11 @@ Applies to:
 
 Additional KPIs
 
-  
-
-- ingest_events_total  – pipeline throughput
-- vector_write_latency_ms  – index performance
-- retrieval_latency_p95_ms  – search speed
-- log_volume_bytes_total  – cost driver
-- metric_series_count  – cardinality control
-
-  
-
-  
-
-  
-
-  
-
-  
-
-4 Monitoring Architecture
-
-  
-
-|   |   |   |
-|---|---|---|
-|Layer|Service|Purpose|
-|Collection|AWS Distro for OpenTelemetry (ADOT)|Unified export of metrics, logs and traces|
-|Metrics|Prometheus → Amazon Managed Prometheus (AMP)|Long-term retention and alerting|
-|Logs|CloudWatch → Firehose → S3 (Parquet) → OpenSearch Serverless|Structured search and forensics|
-|Traces|OpenTelemetry → AWS X-Ray (+ Grafana Tempo)|End-to-end trace correlation|
-|Dashboards|Amazon Managed Grafana|Visualization and context|
-|Alerting|CloudWatch Alarms + AMP Alertmanager + SNS|Real-time notifications|
-
-  
-
-  
-
-  
-
-  
+- ingest_events_total – pipeline throughput
+- vector_write_latency_ms – Weaviate `NcChunkV1` index performance
+- retrieval_latency_p95_ms – search speed
+- log_volume_bytes_total – cost driver
+- metric_series_count – cardinality control
 
 5 Dashboard Standards
 

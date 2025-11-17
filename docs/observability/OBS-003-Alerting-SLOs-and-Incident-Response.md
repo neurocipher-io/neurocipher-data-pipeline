@@ -62,19 +62,7 @@ Includes ingestion APIs, background workers, vector index, orchestration tasks, 
 
   
 
-|   |   |   |
-|---|---|---|
-|Service Area|Target|SLI Definition|
-|Ingest API availability|99.9 % / month|1 − (5xx requests ÷ total requests)|
-|Ingest API latency|p95 ≤ 300 ms|Histogram quantile p95 of request_duration_seconds|
-|Pipeline freshness|99 % ≤ 5 min|Documents available in index ≤ 5 min after ingest|
-|Vector search latency|p95 ≤ 200 ms|Query duration histogram p95|
-|Index error rate|≤ 0.1 %|Failed index writes ÷ total writes|
-|Security action decision latency|p95 ≤ 90 s|`security_engine.decision_latency_ms` from finding event to command acknowledgement|
-
-  
-
-  
+Refer to the canonical Retention & SLO matrix in OBS-001 §5 for the definitive targets, SLIs, and retention durations cited throughout this document. The same metrics (`http_request_duration_seconds`, `weaviate_query_duration_seconds`, `document_processing_latency_seconds`, `security_engine.decision_latency_ms`, etc.) power dashboards and alerting described below.
 
   
 

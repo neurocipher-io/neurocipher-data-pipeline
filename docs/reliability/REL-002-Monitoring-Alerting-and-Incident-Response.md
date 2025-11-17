@@ -79,6 +79,8 @@ Applies to all core AWS components: ingestion (API Gateway, Lambda, ECS), data s
 
 4. Key Metrics
 
+The canonical SLO / retention matrix lives in OBS-001 §5 and also drives the targets listed below; these metrics feed the SLIs that keep the ingest API, vector store, pipeline freshness, and security actions within error budget.
+
   
 
 |   |   |   |
