@@ -43,6 +43,8 @@ Out of scope: BI semantic models, UI view models.
 
 Assumptions: ULIDs as text, UTC timestamps, RLS for tenancy, PgBouncer in front of Postgres.
 
+Tenant context validation and quota guardrails align with docs/security-controls/SEC-005-Multitenancy-Policy.md.
+
   
 
 ## **3. Non-functional requirements**

@@ -169,6 +169,7 @@ PII and security
 
 - Redact emails, tokens, IPs by ADOT processors. Never log secrets.
 - Tenant isolation tag required on all metrics and logs.
+- Tenant identifier handling and header propagation follow docs/security-controls/SEC-005-Multitenancy-Policy.md.
 - S3 buckets encrypted with KMS. Access via IAM least privilege.
 
   
@@ -641,6 +642,7 @@ Security and PII
 
 - Redact tokens/IPs via ADOT processors.
 - Tenant tag mandatory.
+- See docs/security-controls/SEC-005-Multitenancy-Policy.md for the canonical tenant-id format and propagation rules.
 - S3 encrypted (KMS). IAM least privilege.
 
   

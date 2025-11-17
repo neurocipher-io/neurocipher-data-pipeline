@@ -113,6 +113,7 @@ Error budget usage is reviewed monthly in Reliability Report REL-002.
 
 - Alert on user-visible symptoms only (e.g., latency, errors, unavailability).
 - Group alerts by service and tenant to avoid alert storms.
+- Tenant-level grouping and alert metadata follow docs/security-controls/SEC-005-Multitenancy-Policy.md.
 - Mute alerts during deploy for 10 minutes post-success.
 - Every alert links to a runbook in /docs/runbooks/.
 - Alerts must include severity, description, owner, and clear next steps.

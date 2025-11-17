@@ -119,26 +119,7 @@ Envelope
 }
 ```
 
-HTTP to code mapping
-
-- 400 INVALID_REQUEST
-    
-- 401 UNAUTHENTICATED
-    
-- 403 UNAUTHORIZED
-    
-- 404 RESOURCE_NOT_FOUND
-    
-- 409 CONFLICT
-    
-- 422 UNPROCESSABLE_ENTITY
-    
-- 429 RATE_LIMITED
-    
-- 500 INTERNAL
-    
-- 503 UNAVAILABLE
-    
+HTTP to code mapping is canonicalized in docs/api-ops/API-Error-Catalog.md; do not create duplicate tables.
 
 Do not leak stack traces. Fingerprints live in logs.
 

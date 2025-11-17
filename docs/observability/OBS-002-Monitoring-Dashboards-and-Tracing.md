@@ -161,6 +161,7 @@ Dashboards are stored as JSON and provisioned via Terraform.
 - Instrument all APIs and async jobs with OpenTelemetry.
 - Use traceparent and tracestate headers for HTTP propagation.
 - Include correlation_id and tenant_id in async events.
+- Tenant identifier handling for metrics and traces follows docs/security-controls/SEC-005-Multitenancy-Policy.md.
 - One span per external call using the pattern <verb>.<resource> (e.g. get.vectors, post.ingest).
 
   
@@ -365,5 +366,4 @@ Progress is tracked in the Reliability Review Report (REL-002).
 - CloudWatch and Prometheus alert rules equivalent to the examples in this document are in place, with routing to owners defined in `ops/owners.yaml`.
 - Each page-worthy alert links to the appropriate runbook (`RB-ING-001`, `RB-API-002`, `RB-VEC-003`, `RB-OPS-004`) and those runbooks remain current.
 - Distributed tracing is instrumented for APIs and async workloads per this spec and is visible in Grafana/X-Ray with the sampling policy applied.
-
 
