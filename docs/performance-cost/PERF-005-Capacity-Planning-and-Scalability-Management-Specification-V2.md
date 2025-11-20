@@ -1,3 +1,8 @@
+id: PERF-005
+title: Capacity Planning and Scalability Management Specification
+owner: Platform SRE / FinOps / Infrastructure Architecture
+status: Final v1.0
+last_reviewed: 2025-11-06
 
 PERF-005 — Capacity Planning and Scalability Management Specification
 
@@ -15,7 +20,7 @@ Applies to: Neurocipher Core pipeline (see docs/integrations/)
 
 Last Reviewed: 2025-11-06
 
-References: PERF-001–004, OPS-001, CI/CL-003, ADR-009, REL-001, REL-002
+References: PERF-001–004, OPS-001, CI/CL-003, ADR-009, REL-001, REL-002, CAP-001
 
   
 

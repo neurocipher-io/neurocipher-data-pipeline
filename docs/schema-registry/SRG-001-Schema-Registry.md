@@ -1,3 +1,9 @@
+id: SRG-001
+title: Schema Registry
+owner: Data Platform Lead
+status: For Board Review
+last_reviewed: 2025-10-30
+
 # SRG-001 Schema Registry
 
 ## Document control
@@ -32,6 +38,7 @@ Define a single authoritative registry for all schemas used across ingestion, pr
 - SEC-002 IAM Policy and Trust Relationship Map
 - SEC-003 Network Policy and Segmentation
 - SEC-004 Secrets and KMS Rotation Playbook
+- SEC-005 Multitenancy policy
 - TEST-001 Testing and Quality Gates
 - TEST-002 Continuous Integration and Test Automation
 - TEST-003 Quality Assurance and Release Validation
@@ -303,3 +310,12 @@ Semantic versioning. Patch for safe metadata changes. Minor for additive optiona
 ## Observability
 
 - Metrics: `registry.read.latency`, `registry.read.throughput`, `registry.write.latency`, `validation.failures`, \`active\_v
+
+## Acceptance Criteria
+
+- All ingested records carry `{schema_urn, version}` and noncompliant payloads are rejected at ingress, with failures exposed via metrics and logs.
+- Registry API and storage layout (S3, DynamoDB) are deployed with KMS signing, immutability, and tagging as defined in the storage and security sections.
+- Compatibility modes for events, tables, and APIs are enforced according to the compatibility matrix, with CI contract tests covering each mode.
+- Provenance metadata (`repo_url`, `commit_sha`, `change_ticket`, `build_id`) is recorded for each schema version and retrievable for audit.
+- Read SLOs for `GET /schemas/{schema_id}/versions/{semver}` (availability and latency) are met in staging and production environments.
+- At least one end-to-end publish/activate/deprecate/rollback workflow has been exercised in a non-production environment with evidence attached to a change ticket.

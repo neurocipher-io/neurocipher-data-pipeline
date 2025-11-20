@@ -1,3 +1,9 @@
+id: REL-002
+title: Monitoring, Alerting and Incident Response
+owner: Reliability Engineering
+status: Approved
+last_reviewed: 2025-10-24
+
 Document ID: REL-002
 
 Title: Monitoring, Alerting & Incident Response
@@ -25,6 +31,8 @@ Date: 2025-10-24
   
 
 Provide unified observability, proactive alerting, and structured incident response to maintain reliability and minimize downtime across the Neurocipher Data Pipeline.
+
+The capacity and cost assumptions that drive these targets are described in `docs/CAP-001-Capacity-Model.md`; align alerts, dashboards, and incident escalations with that model’s QPS, queue, and vector throughput expectations.
 
   
 
@@ -72,6 +80,8 @@ Applies to all core AWS components: ingestion (API Gateway, Lambda, ECS), data s
   
 
 4. Key Metrics
+
+The canonical SLO / retention matrix lives in OBS-001 §5 and also drives the targets listed below; these metrics feed the SLIs that keep the ingest API, vector store, pipeline freshness, and security actions within error budget.
 
   
 
@@ -267,5 +277,14 @@ Applies to all core AWS components: ingestion (API Gateway, Lambda, ECS), data s
   
 
 Alert thresholds, notification policies, or escalation trees require review by Reliability Engineering and approval from the CTO prior to deployment.
+
+## Acceptance Criteria
+
+- The observability stack (metrics, logs, traces, dashboards) described in this document is deployed for all in-scope services, with key metrics and SLOs wired into dashboards.
+- Alerting rules for pipeline failure, queue backlog, RDS replication lag, CPU exhaustion, security findings, and cost anomalies are implemented with correct routing (PagerDuty, Slack, FinOps) and tested.
+- Severity levels (P1–P4) and the incident response workflow are in active use; incidents are classified and handled according to the defined SLAs.
+- Weekly or monthly reliability reports and postmortem summaries are produced and retained as specified, with SLIs/SLOs tracked over time.
+- Changes to alert thresholds or escalation policies follow the change-control process and are approved by Reliability Engineering and the appropriate leadership.
+- Incident postmortems and dashboards reference the classification/masking evidence from `docs/governance/REF-001-Glossary-and-Standards-Catalog.md §8` and DQ-001 when PII data contributed to the event.
 
   

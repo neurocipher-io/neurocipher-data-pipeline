@@ -1,10 +1,16 @@
+id: LIN-001
+title: Data Lineage and Catalog Specification
+owner: Data Platform Lead / Governance Engineering
+status: Final v1.0
+last_reviewed: 2025-11-09
+
 # Document ID: LIN-001
 **Title:** Data Lineage and Catalog Specification  
 **Status:** Final v1.0  
 **Owner:** Data Platform Lead / Governance Engineering  
 **Applies to:** Neurocipher Core pipeline (see docs/integrations/)  
 **Last Reviewed:** 2025-11-09  
-**References:** ING-001–003, PROC-001–003, DM-001–005, DCON-001, SRG-001, LAK-001, DQ-001, OBS-001–003, CI/CL-001–003, GOV-001, GOV-002, ADR-011
+**References:** ING-001–003, PROC-001–003, DM-001–005, DCON-001, SRG-001, LAK-001, DQ-001, OBS-001–003, CI/CL-001–003, GOV-001, GOV-002, SEC-005, ADR-011
 
 ---
 

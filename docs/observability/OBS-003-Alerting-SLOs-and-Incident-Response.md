@@ -1,5 +1,11 @@
 
 
+id: OBS-003
+title: Alerting, SLOs and Incident Response
+owner: Reliability Engineering
+status: Approved
+last_reviewed: 2025-10-24
+
 OBS-003 Alerting, SLOs and Incident Response
 
   
@@ -56,19 +62,7 @@ Includes ingestion APIs, background workers, vector index, orchestration tasks, 
 
   
 
-|   |   |   |
-|---|---|---|
-|Service Area|Target|SLI Definition|
-|Ingest API availability|99.9 % / month|1 − (5xx requests ÷ total requests)|
-|Ingest API latency|p95 ≤ 300 ms|Histogram quantile p95 of request_duration_seconds|
-|Pipeline freshness|99 % ≤ 5 min|Documents available in index ≤ 5 min after ingest|
-|Vector search latency|p95 ≤ 200 ms|Query duration histogram p95|
-|Index error rate|≤ 0.1 %|Failed index writes ÷ total writes|
-|Security action decision latency|p95 ≤ 90 s|`security_engine.decision_latency_ms` from finding event to command acknowledgement|
-
-  
-
-  
+Refer to the canonical Retention & SLO matrix in OBS-001 §5 (and the capacity/cost model in `docs/CAP-001-Capacity-Model.md`) for the definitive targets, SLIs, and retention durations cited throughout this document. The same metrics (`http_request_duration_seconds`, `weaviate_query_duration_seconds`, `document_processing_latency_seconds`, `security_engine.decision_latency_ms`, etc.) power dashboards and alerting described below.
 
   
 
@@ -107,6 +101,7 @@ Error budget usage is reviewed monthly in Reliability Report REL-002.
 
 - Alert on user-visible symptoms only (e.g., latency, errors, unavailability).
 - Group alerts by service and tenant to avoid alert storms.
+- Tenant-level grouping and alert metadata follow docs/security-controls/SEC-005-Multitenancy-Policy.md.
 - Mute alerts during deploy for 10 minutes post-success.
 - Every alert links to a runbook in /docs/runbooks/.
 - Alerts must include severity, description, owner, and clear next steps.
@@ -308,3 +303,11 @@ Access is controlled by IAM roles (IncidentResponder, SREManager).
 - Quarterly review of SLO targets and incident trend analysis.
 - Metrics tracked: MTTD, MTTR, error budget burn rate, false-positive alerts.
 - Annual game-day simulations for disaster response (see REL-001).
+
+## 13. Acceptance Criteria
+
+- SLOs and SLIs defined in this spec (including ingest availability, freshness, vector latency, index error rate, and Security Engine latency) are implemented and tracked in observability tooling.
+- Error-budget burn alerts are configured for the defined SLOs with page/ticket thresholds matching this document.
+- Every alert above a page or ticket severity links to a runbook under `docs/runbooks/` and includes severity, owner, and clear next steps.
+- On-call rotations and escalation paths are documented and kept current in incident tooling and `/ops` docs, including the Incident Register and oncall checklist.
+- Post-incident reviews for qualifying incidents are recorded in `/ops/postmortems/` within 72 hours and include the checklist items from this spec.

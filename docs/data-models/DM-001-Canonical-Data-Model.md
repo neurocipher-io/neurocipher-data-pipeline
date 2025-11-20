@@ -1,3 +1,9 @@
+id: DM-001
+title: Canonical Data Model
+owner: Data Architecture
+status: Ready for review
+last_reviewed: 2025-10-28
+
 # **DM-001 Canonical Data Model**
 
   
@@ -49,8 +55,9 @@ Out of scope: UI view models, per-cloud raw provider payloads, pricing and billi
 - ADR-007 Data Lifecycle and Retention
     
 - SEC-001..004 Security series
+- SEC-005 Multitenancy policy
     
-
+  
   
 
 ## **4. Conventions**
@@ -638,7 +645,7 @@ PII handling rules:
 
   
 
-## **12. Acceptance criteria**
+## **12. Acceptance Criteria**
 
 - All entities include common fields and account_id where tenant-scoped.
     

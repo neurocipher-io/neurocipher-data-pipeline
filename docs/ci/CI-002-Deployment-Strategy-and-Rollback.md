@@ -1,3 +1,9 @@
+id: CI-002
+title: Continuous Delivery and Environment Promotion Specification
+owner: Release Engineering, SRE Lead, Security Lead
+status: Draft for review
+last_reviewed: 2025-11-15
+
 # **CI/CL-002 — Continuous Delivery and Environment Promotion Specification**
 
   
@@ -17,6 +23,8 @@
   
 
 Provide deterministic delivery, environment isolation, and controlled promotion from dev to prod with auditability and rapid rollback.
+
+This delivery guardrails reference the throughput and queue capacity assumptions captured in `docs/CAP-001-Capacity-Model.md`.
 
   
 

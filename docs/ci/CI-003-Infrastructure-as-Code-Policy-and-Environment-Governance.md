@@ -1,3 +1,9 @@
+id: CI-003
+title: Release Management, Change Control, and Operational Readiness
+owner: Release Engineering, SRE Lead, Security Lead, Product Owner
+status: Draft for review
+last_reviewed: 2025-11-15
+
 # **CI/CL-003 — Release Management, Change Control, and Operational Readiness**
 
   
@@ -17,6 +23,8 @@
   
 
 Standardize releases. Reduce risk. Ensure fast rollback. Preserve full audit evidence.
+
+Release readiness checks depend on the capacity/cost envelope recorded in `docs/CAP-001-Capacity-Model.md` (QPS, queue depth, Weaviate throughput).
 
   
 

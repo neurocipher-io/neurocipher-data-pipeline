@@ -1,10 +1,16 @@
+id: DQ-001
+title: Data Quality Gates Specification
+owner: Data Platform Lead / Governance Engineering
+status: Final v1.0
+last_reviewed: 2025-11-09
+
 # Document ID: DQ-001
 **Title:** Data Quality Gates Specification  
 **Status:** Final v1.0  
 **Owner:** Data Platform Lead / Governance Engineering  
 **Applies to:** Neurocipher Core pipeline (see docs/integrations/) Pipelines  
 **Last Reviewed:** 2025-11-09  
-**References:** ING-001–003, PROC-001–003, DM-001–005, DCON-001, SRG-001, LAK-001, LIN-001, OBS-001–003, CI/CL-001–003, GOV-001, GOV-002, ADR-011
+**References:** ING-001–003, PROC-001–003, DM-001–005, DCON-001, SRG-001, LAK-001, LIN-001, OBS-001–003, CI/CL-001–003, GOV-001, GOV-002, ADR-011, SEC-005
 
 ---
 
@@ -27,6 +33,8 @@ These quality gates ensure reliability, consistency, and compliance through auto
 
 ## 3. Quality Gate Framework
 Quality gates are declarative YAML policies stored in the `schema-registry/dq/` repository and deployed via CI pipelines. Each gate is evaluated automatically during data movement or promotion.
+
+Classification levels from `docs/governance/REF-001-Glossary-and-Standards-Catalog.md §8` determine whether a gate applies (P1+ data must trigger DQ masking rules); every gate must document the expected PII tier.
 
 | Gate ID | Category | Description | Enforcement Stage | Spec Reference |
 |----------|-----------|--------------|------------------|----------------|

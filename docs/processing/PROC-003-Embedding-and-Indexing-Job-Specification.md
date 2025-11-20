@@ -1,3 +1,9 @@
+id: PROC-003
+title: Embedding & Indexing Job Specification
+owner: Data Platform Lead / Pipeline Engineering
+status: Final v1.0
+last_reviewed: 2025-11-08
+
 # Document ID: PROC-003
 **Title:** Embedding & Indexing Job Specification  
 **Status:** Final v1.0  
@@ -73,7 +79,7 @@ All records must include `{tenant, source_urn, content_hash, mime, tokens, reten
 | **AuthZ** | Least privilege per target store; ABAC by tenant and environment |
 | **Secrets** | Secrets Manager for API keys; SSM for non‑secret params |
 | **Encryption** | TLS 1.3 in transit; KMS at rest on S3/Weaviate/OpenSearch/RDS |
-| **Logging** | No PII or raw tokens; hash or drop sensitive fields |
+| **Logging** | No PII or raw tokens; hash or drop sensitive fields (see REF-001 §8 for classification levels and DQ-001 masking rules) |
 | **Audit** | CloudTrail + DynamoDB run ledger with correlation IDs |
 
 ---

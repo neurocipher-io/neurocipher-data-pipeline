@@ -1,4 +1,8 @@
-
+id: PERF-003
+title: Continuous Performance Monitoring and Optimization Framework
+owner: Platform SRE / FinOps / Performance Engineering
+status: Final v1.0
+last_reviewed: 2025-11-06
 
 PERF-003 — Continuous Performance Monitoring and Optimization Framework
 
@@ -16,7 +20,7 @@ Applies to: Neurocipher Core pipeline (see docs/integrations/)
 
 Last Reviewed: 2025-11-06
 
-References: PERF-001, PERF-002, OPS-001, OBS-001-003, REL-002, ADR-011
+References: PERF-001, PERF-002, OPS-001, OBS-001-003, REL-002, ADR-011, CAP-001
 
   
 

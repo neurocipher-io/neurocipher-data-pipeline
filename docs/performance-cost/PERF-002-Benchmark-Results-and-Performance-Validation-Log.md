@@ -1,3 +1,9 @@
+id: PERF-002
+title: Benchmark Results and Performance Validation Log
+owner: Platform SRE / QA Performance Engineering
+status: Final v1.0
+last_reviewed: 2025-11-06
+
 Document ID: PERF-002
 
 Title: Benchmark Results and Performance Validation Log
@@ -10,7 +16,7 @@ Applies to: Neurocipher Core pipeline (see docs/integrations/)
 
 Last Reviewed: 2025-11-06
 
-References: PERF-001, OPS-001, OBS-001-003, REL-002, ADR-011
+References: PERF-001, OPS-001, OBS-001-003, REL-002, ADR-011, CAP-001
 
   
 

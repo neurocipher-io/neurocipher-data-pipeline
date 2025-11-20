@@ -1,3 +1,8 @@
+id: PERF-004
+title: Performance Regression Testing and Release Certification
+owner: QA Performance Engineering / Platform SRE
+status: Final v1.0
+last_reviewed: 2025-11-06
 
 PERF-004 — Performance Regression Testing and Release Certification
 
@@ -15,7 +20,7 @@ Applies to: Neurocipher Core pipeline (see docs/integrations/)
 
 Last Reviewed: 2025-11-06
 
-References: PERF-001-003, OPS-001, CI/CL-001-003, ADR-011, REL-002
+References: PERF-001-003, OPS-001, CI/CL-001-003, ADR-011, REL-002, CAP-001
 
   
 

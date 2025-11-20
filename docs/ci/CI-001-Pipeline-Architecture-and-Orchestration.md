@@ -2,6 +2,12 @@
 
   
 
+id: CI-001
+title: Continuous Integration Platform and Workflow Specification
+owner: Release Engineering, QA Lead, Security Lead
+status: Draft for review
+last_reviewed: 2025-11-15
+
 CI/CL-001 — Continuous Integration Platform and Workflow Specification
 
   
@@ -27,6 +33,8 @@ Default region: ca-central-1
   
 
 Provide a deterministic CI system with enforced quality gates, supply chain controls, and reproducible build artifacts that downstream CD trusts.
+
+Capacity and throughput assumptions that feed these quality gates are defined in `docs/CAP-001-Capacity-Model.md`.
 
   
 
