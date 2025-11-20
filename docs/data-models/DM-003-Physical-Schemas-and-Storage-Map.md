@@ -396,7 +396,7 @@ CREATE TABLE IF NOT EXISTS nc.control (
   severity    nc.severity NOT NULL,
   category    text NOT NULL,
   rationale   text,
-  references  jsonb,
+  "references"  jsonb,
   valid_from  timestamptz NOT NULL,
   valid_to    timestamptz,
   is_current  boolean NOT NULL,
@@ -555,13 +555,14 @@ CREATE POLICY p_notification_tenant ON nc.notification USING (account_id = nc.cu
 
 ```
 CREATE TABLE IF NOT EXISTS nc.audit_log (
-  id            text PRIMARY KEY,
+  id            text NOT NULL,
   account_id    text NOT NULL REFERENCES nc.account(id),
   actor_user_id text,
   action        text NOT NULL,
   target        jsonb NOT NULL,
   ip            text,
-  occurred_at   timestamptz NOT NULL
+  occurred_at   timestamptz NOT NULL,
+  PRIMARY KEY (id, occurred_at)
 ) PARTITION BY RANGE (occurred_at);
 
 CREATE TABLE IF NOT EXISTS nc.audit_log_2025_10
@@ -595,14 +596,15 @@ CREATE POLICY p_job_tenant ON nc.job USING (account_id = nc.current_account_id()
 
 ```
 CREATE TABLE IF NOT EXISTS nc.event (
-  id              text PRIMARY KEY,
+  id              text NOT NULL,
   account_id      text NOT NULL REFERENCES nc.account(id),
   type            text NOT NULL,
   schema_version  int  NOT NULL,
   event_version   int  NOT NULL,
   occurred_at     timestamptz NOT NULL,
   payload         jsonb NOT NULL,
-  checksum_sha256 text NOT NULL
+  checksum_sha256 text NOT NULL,
+  PRIMARY KEY (id, occurred_at)
 ) PARTITION BY RANGE (occurred_at);
 
 CREATE TABLE IF NOT EXISTS nc.event_2025_10

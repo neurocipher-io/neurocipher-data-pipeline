@@ -38,8 +38,12 @@ db_local_up:
 	    $(PG_IMAGE)
 
 # Apply all Postgres migrations in order to the local container database.
+# For convenience in local development, drop and recreate $(PG_DB) each time so
+# migrations can assume a clean baseline without needing IF NOT EXISTS on every object.
 db_local_migrate:
 	@docker exec -i $(PG_CONTAINER_NAME) sh -lc 'set -e; \
+	  dropdb -U $(PG_USER) $(PG_DB) >/dev/null 2>&1 || true; \
+	  createdb -U $(PG_USER) $(PG_DB); \
 	  for f in /workspace/migrations/postgres/*.sql; do \
 	    echo "Applying $$f"; \
 	    psql -U $(PG_USER) -d $(PG_DB) -v ON_ERROR_STOP=1 -f "$$f"; \
