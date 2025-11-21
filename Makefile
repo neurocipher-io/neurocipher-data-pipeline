@@ -7,7 +7,7 @@ PG_USER ?= postgres
 PG_PASSWORD ?= postgres
 PG_DB ?= nc_dev
 
-.PHONY: fmt lint test db_local_up db_local_migrate db_local_down
+.PHONY: fmt lint test db_local_up db_local_migrate db_local_down db_local_smoke_test
 
 fmt:
 	ruff --fix .
@@ -52,3 +52,20 @@ db_local_migrate:
 # Stop the local Postgres container if it is running.
 db_local_down:
 	@docker stop $(PG_CONTAINER_NAME) >/dev/null 2>&1 || true
+
+# Install Python test dependencies if needed
+db_test_deps:
+	@which pytest > /dev/null 2>&1 || pip install -q -r tests/requirements.txt
+
+# Run local smoke tests for RLS and scan → finding → ticket chain
+# Prerequisites: Docker running, db_local_up and db_local_migrate completed
+# Usage: NC_DB_LOCAL_TEST=1 make db_local_smoke_test
+db_local_smoke_test: db_local_up db_local_migrate db_test_deps
+	@echo "Running local smoke tests for multi-tenant RLS and scan chain..."
+	@NC_DB_LOCAL_TEST=1 \
+	 NC_DB_HOST=localhost \
+	 NC_DB_PORT=$(PG_PORT) \
+	 NC_DB_NAME=$(PG_DB) \
+	 NC_DB_USER=nc_app_rw \
+	 NC_DB_PASSWORD=nc_app_rw \
+	 pytest tests/db/test_rls_scan_chain.py -v
