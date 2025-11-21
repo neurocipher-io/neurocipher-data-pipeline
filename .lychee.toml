@@ -1,13 +1,11 @@
 exclude = [
-  "^s3://",
-  "^gs://",
-  "https://kv-seg-prod.vault.azure.net",
-  "https://kv-seg-prod.vault.azure.net/.*",
-  "https://schemas\\.neurocipher\\.io/.*",
-  "https://json-schema.org/.*",
-  "https://neurocipher.io/problems/validation-error",
-  "https://github.com/neurocipher-io/neurocipher-core"
+    "https://api\\.neurocipher\\.io/.*",
+    "https://stg-api\\.neurocipher\\.io/.*",
+    "http://localhost:8000/.*",
+    "https://schemas\\.neurocipher\\.io/.*",
+    "https://neurocipher\\.io/problems/.*",
+    "https://kv-seg-prod\\.vault\\.azure\\.net/.*",
+    "https://kv-seg-prod\\.vault\\.azure\\.net/keys/attestation-key/.*"
 ]
 
-exclude_mail = true
-accept = ["200..499"]
+accept = [200, 201, 202, 204, 301, 302]
