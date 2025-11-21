@@ -36,6 +36,10 @@ db_local_up:
 	    -p $(PG_PORT):5432 \
 	    -v $(PWD):/workspace \
 	    $(PG_IMAGE)
+	@echo "Waiting for Postgres to be ready..."
+	@for i in 1 2 3 4 5 6 7 8 9 10; do \
+	  docker exec $(PG_CONTAINER_NAME) pg_isready -U $(PG_USER) >/dev/null 2>&1 && break || sleep 1; \
+	done
 
 # Apply all Postgres migrations in order to the local container database.
 # For convenience in local development, drop and recreate $(PG_DB) each time so

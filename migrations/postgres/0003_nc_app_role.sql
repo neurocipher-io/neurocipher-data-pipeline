@@ -35,7 +35,7 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA nc
   GRANT EXECUTE ON FUNCTIONS TO nc_app_rw;
 
 ALTER DEFAULT PRIVILEGES IN SCHEMA nc
-  GRANT EXECUTE ON PROCEDURES TO nc_app_rw;
+  GRANT EXECUTE ON ROUTINES TO nc_app_rw;
 
 -- Comment for documentation
 COMMENT ON ROLE nc_app_rw IS 'Application role for read-write operations with RLS enforcement';
