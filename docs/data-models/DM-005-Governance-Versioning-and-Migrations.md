@@ -332,6 +332,8 @@ CREATE INDEX CONCURRENTLY IF NOT EXISTS ix_find_status
     
 - After window, delete old class and rows.
     
+- Index type changes (for example `hnsw` → `flat` with RQ or `spfresh`) MUST follow the same `NcChunkV{n+1}` dual-write cutoff pattern. Production cutover REQUIRES benchmark results (latency/recall vs `hnsw`) and updated DR/backup documentation before retiring the previous class.
+    
 
   
 

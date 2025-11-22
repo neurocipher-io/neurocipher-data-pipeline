@@ -35,7 +35,7 @@ Define the authoritative physical design for PostgreSQL, S3, and Weaviate. Cover
 
 ## **2. Scope and assumptions**
 
-In scope: all DM-001 entities. Storage targets: PostgreSQL 15+, S3 with SSE-KMS, Weaviate 1.24+ multi-tenant.
+In scope: all DM-001 entities. Storage targets: PostgreSQL 15+, S3 with SSE-KMS, Weaviate 1.34+ multi-tenant.
 
 Out of scope: BI semantic models, UI view models.
 
@@ -801,6 +801,11 @@ Indexing contract
 - embedding_ref stores weaviate_class and weaviate_uuid
     
 - Delete in Weaviate only after embedding_ref delete
+    
+- **Index types supported**
+  - **Baseline**: `hnsw` for `NcChunkV1` in every environment.
+  - **Optional (preview, dev/stg only)**: `flat` (with rotational quantization, RQ) and `spfresh` MAY be evaluated under the DM-005 Weaviate upgrade process.
+  - Production defaults remain `hnsw` until benchmark and DR/backup validation are completed for any alternative index type.
     
 
 ### **11.1 Search index (OpenSearch nc-chunk-v1)**
