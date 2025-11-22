@@ -1,0 +1,163 @@
+{
+  "repository": "neurocipher-io/neurocipher-data-pipeline",
+  "milestones": [
+    {
+      "title": "DB-ML0 – Inventory and gap map",
+      "description": "Single, accurate map of all entities and where they physically live (Postgres / S3 / Weaviate), plus what's implemented vs not."
+    },
+    {
+      "title": "DB-ML1 – Postgres OLTP schema finalized (nc.*)",
+      "description": "nc schema is complete, consistent with DM-003, and safe to run in dev/stg/prod."
+    },
+    {
+      "title": "DB-ML2 – Lake / Iceberg layout (LAK-001 + physical DDL)",
+      "description": "Define and implement the analytical/lake tables for long-term storage and heavy analytics, separate from OLTP."
+    },
+    {
+      "title": "DB-ML3 – Weaviate / vector schema and indexes",
+      "description": "Clean, documented Weaviate schema with clear governance for class versions and index types."
+    },
+    {
+      "title": "DB-ML4 – Cross-store contracts and lineage",
+      "description": "Every piece of data has a clear contract and lineage between Postgres, S3/Iceberg, and Weaviate."
+    },
+    {
+      "title": "DB-ML5 – DR, performance, and capacity for the DB layer",
+      "description": "Database layer is not only designed but also operable: DR, performance targets, and capacity planning exist and are enforceable."
+    }
+  ],
+  "issues": [
+    {
+      "milestone": "DB-ML0 – Inventory and gap map",
+      "title": "DB-001: Build entity → store → migration status matrix",
+      "body": "Complete an entity inventory and implementation status mapping.\n\n**Tasks:**\n- [ ] List all entities from DM-001/DM-003 (account, user, scan, finding, evidence, remediation, ticket, integration, notification, asset, control, policy, audit_log, event, ingestion/embedding chain, etc.)\n- [ ] For each entity, record:\n  - [ ] Logical name\n  - [ ] Physical store(s): postgres.nc.*, s3://..., Weaviate NcChunkV1, future Iceberg tables\n  - [ ] Multi-tenant or global classification\n- [ ] Document findings in a structured table format\n\n**Done when:**\n- Single table listing \"logical entity → physical store(s) → migration file → status\" exists\n- No entities are \"mystery\" anymore (everything is classified: done / partial / missing)",
+      "labels": ["area:db", "type:docs", "priority:high"]
+    },
+    {
+      "milestone": "DB-ML0 – Inventory and gap map",
+      "title": "DB-002: Complete implementation status audit for all entities",
+      "body": "Audit implementation status for all entities and tables.\n\n**Tasks:**\n- [ ] For each entity/table, verify:\n  - [ ] Is it fully covered in migrations 0001 + 0002?\n  - [ ] Are RLS + trg_tenant_guard in place (for tenant tables)?\n  - [ ] Are indexes defined for the main query patterns?\n- [ ] Document coverage gaps\n- [ ] Create tracking table for implementation completeness\n\n**Done when:**\n- Complete audit of all entities exists\n- Implementation status is documented for each entity",
+      "labels": ["area:db", "type:audit", "priority:high"]
+    },
+    {
+      "milestone": "DB-ML0 – Inventory and gap map",
+      "title": "DB-003: Create gap list and mismatch documentation",
+      "body": "Document all gaps and mismatches between design and implementation.\n\n**Tasks:**\n- [ ] Create a gap list document (DM-003-Gaps.md or add section to DM-003)\n- [ ] List entities defined in DM-003 but not yet implemented\n- [ ] List entities implemented but not yet fully documented (indexes, retention, partitioning)\n- [ ] Document any mismatch between docs and live schema\n- [ ] Prioritize gaps for resolution\n\n**Done when:**\n- Gap list document exists and is comprehensive\n- All mismatches between documentation and implementation are identified",
+      "labels": ["area:db", "type:docs", "priority:high"]
+    },
+    {
+      "milestone": "DB-ML1 – Postgres OLTP schema finalized (nc.*)",
+      "title": "DB-004: Complete nc.* physical DDL for all entities",
+      "body": "Ensure all nc.* tables are fully defined in migrations.\n\n**Tasks:**\n- [ ] For every nc.* table in DM-003:\n  - [ ] Confirm presence in migrations (0001, 0002 or future 0003+)\n  - [ ] Add missing tables or columns via new migration(s)\n  - [ ] Ensure all reserved words are properly handled (e.g., \"references\" in nc.control)\n- [ ] Review and validate DDL consistency\n- [ ] Test migrations on clean database\n\n**Done when:**\n- All nc.* tables from DM-003 exist in migrations\n- No missing tables or columns remain\n- All reserved words are properly handled",
+      "labels": ["area:db", "type:migrations", "priority:high"]
+    },
+    {
+      "milestone": "DB-ML1 – Postgres OLTP schema finalized (nc.*)",
+      "title": "DB-005: Complete nc.* RLS + tenant guard coverage",
+      "body": "Ensure RLS and tenant guard are properly configured for all tenant tables.\n\n**Tasks:**\n- [ ] Confirm trg_tenant_guard + RLS:\n  - [ ] Exist on all tenant tables (account-scoped)\n  - [ ] Do not exist on global tables (where appropriate)\n- [ ] Add smoke-test SQL blocks for critical flows:\n  - [ ] ingestion→chunk→embedding_ref\n  - [ ] scan→finding→ticket\n  - [ ] Other critical multi-tenant data flows\n- [ ] Test tenant isolation thoroughly\n\n**Done when:**\n- All tenant tables have proper RLS and tenant guards\n- Smoke tests validate tenant isolation\n- No cross-tenant data leaks possible",
+      "labels": ["area:db", "type:migrations", "priority:critical"]
+    },
+    {
+      "milestone": "DB-ML1 – Postgres OLTP schema finalized (nc.*)",
+      "title": "DB-006: Define and implement indexes and constraints for major tables",
+      "body": "Add necessary indexes and constraints for performance and data integrity.\n\n**Tasks:**\n- [ ] For each major table (scan, finding, ticket, asset, audit_log, event):\n  - [ ] Define primary keys (composite where needed, e.g. (id, occurred_at))\n  - [ ] Add necessary secondary indexes:\n    - [ ] scan(status, account_id, started_at)\n    - [ ] finding(account_id, status, severity)\n    - [ ] ticket(account_id, status, priority)\n    - [ ] audit_log(account_id, timestamp, action)\n    - [ ] event(account_id, occurred_at, event_type)\n- [ ] Document indexes in DM-003 under each table's section\n- [ ] Test query performance with indexes\n\n**Done when:**\n- All major tables have proper primary keys and indexes\n- Index strategy is documented in DM-003\n- Query performance is validated",
+      "labels": ["area:db", "type:migrations", "priority:high"]
+    },
+    {
+      "milestone": "DB-ML1 – Postgres OLTP schema finalized (nc.*)",
+      "title": "DB-007: Implement retention and partitioning for large tables",
+      "body": "Define and implement partitioning strategy and retention policies.\n\n**Tasks:**\n- [ ] Confirm partitioning strategy for big tables:\n  - [ ] audit_log: partition by time (e.g., monthly) or by account_id + time\n  - [ ] event: partition by time or account_id + time\n  - [ ] finding: evaluate need for partitioning\n- [ ] Ensure retention procedures exist in migrations\n- [ ] Document retention policies in DM-003:\n  - [ ] How many days/months data is kept\n  - [ ] What happens on purge\n  - [ ] Archival strategy\n- [ ] Test partition creation and retention procedures\n\n**Done when:**\n- Partitioning is implemented for large tables\n- Retention procedures are in place and tested\n- All policies are documented in DM-003",
+      "labels": ["area:db", "type:migrations", "priority:medium"]
+    },
+    {
+      "milestone": "DB-ML1 – Postgres OLTP schema finalized (nc.*)",
+      "title": "DB-008: Build automated migration harness and smoke tests",
+      "body": "Create comprehensive testing harness for database migrations and schema.\n\n**Tasks:**\n- [ ] Lock in Makefile targets:\n  - [ ] db_local_up\n  - [ ] db_local_migrate\n  - [ ] db_local_down\n- [ ] Add minimal test script that:\n  - [ ] Runs db_local_up, db_local_migrate\n  - [ ] Executes smoke-test SQL for:\n    - [ ] Ingestion path\n    - [ ] scan→finding→ticket path\n    - [ ] RLS isolation verification\n  - [ ] Exits non-zero on failure\n- [ ] Integrate into CI/CD pipeline\n\n**Done when:**\n- make db_local_up && make db_local_migrate gives fully functional nc_dev\n- Smoke-test SQL covers all critical flows and passes\n- Tests run successfully in CI",
+      "labels": ["area:db", "type:testing", "priority:high"]
+    },
+    {
+      "milestone": "DB-ML2 – Lake / Iceberg layout (LAK-001 + physical DDL)",
+      "title": "DB-009: Define LAK-001 lakehouse layout specification",
+      "body": "Create comprehensive lakehouse layout specification.\n\n**Tasks:**\n- [ ] Write LAK-001-Lakehouse-Layout.md describing:\n  - [ ] Which entities are mirrored to the lake (finding, asset, scan, ticket, audit_log, event)\n  - [ ] Table naming conventions (e.g., nc_lake.finding_v1)\n  - [ ] Partitioning scheme (e.g., by account_id and date)\n  - [ ] Storage format (Iceberg/Parquet, compression, encryption)\n- [ ] Align with existing docs (DM-003, DM-005)\n- [ ] Review and validate with team\n\n**Done when:**\n- LAK-001 exists and is consistent with DM-003/DM-005 naming\n- Storage format and partitioning strategy is clearly defined",
+      "labels": ["area:lakehouse", "type:docs", "priority:high"]
+    },
+    {
+      "milestone": "DB-ML2 – Lake / Iceberg layout (LAK-001 + physical DDL)",
+      "title": "DB-010: Map OLTP → Lake projections for all entities",
+      "body": "Define transformation and projection logic from OLTP to lake tables.\n\n**Tasks:**\n- [ ] For each lake table:\n  - [ ] Define projection from nc.* tables (which columns, denormalization strategy)\n  - [ ] Include soft-deletion / is_current semantics where relevant\n  - [ ] Document transformation logic\n- [ ] Create mapping documentation\n- [ ] Define data quality checks\n\n**Done when:**\n- Clear mapping exists from every nc.* table to its lake equivalent\n- Transformation logic is documented\n- For every major entity, lake table schema is defined",
+      "labels": ["area:lakehouse", "type:docs", "priority:high"]
+    },
+    {
+      "milestone": "DB-ML2 – Lake / Iceberg layout (LAK-001 + physical DDL)",
+      "title": "DB-011: Create Iceberg table DDL and bootstrap process",
+      "body": "Implement initial Iceberg table definitions and bootstrap procedures.\n\n**Tasks:**\n- [ ] Create initial Iceberg table DDL for dev environment\n- [ ] Decide orchestration approach (pipeline, not DB)\n- [ ] Document target schema and layout clearly\n- [ ] Create bootstrap scripts or procedures\n- [ ] Test table creation and basic operations\n\n**Done when:**\n- Initial Iceberg DDL exists for all planned lake tables\n- Bootstrap process is documented\n- Tables can be created in dev environment",
+      "labels": ["area:lakehouse", "type:migrations", "priority:medium"]
+    },
+    {
+      "milestone": "DB-ML2 – Lake / Iceberg layout (LAK-001 + physical DDL)",
+      "title": "DB-012: Define retention and DR for lakehouse",
+      "body": "Establish retention policies and disaster recovery procedures for lakehouse.\n\n**Tasks:**\n- [ ] Define retention policies:\n  - [ ] How long lake data is kept\n  - [ ] Archival strategy\n  - [ ] Compaction and cleanup procedures\n- [ ] Document recovery procedures:\n  - [ ] Can OLTP be rehydrated from lake snapshots?\n  - [ ] Analytics-only recovery?\n  - [ ] Point-in-time recovery capabilities\n- [ ] Integrate with DR-001 document\n\n**Done when:**\n- Retention policies are defined and documented\n- Recovery procedures are documented in LAK-001 or DR-001\n- Backup and restore strategy is clear",
+      "labels": ["area:lakehouse", "type:docs", "priority:medium"]
+    },
+    {
+      "milestone": "DB-ML3 – Weaviate / vector schema and indexes",
+      "title": "DB-013: Lock baseline Weaviate class schema (NcChunkV1)",
+      "body": "Finalize and lock the baseline Weaviate schema.\n\n**Tasks:**\n- [ ] Confirm NcChunkV1 Weaviate schema:\n  - [ ] Class name, properties, multi-tenant config (tenant = account_id)\n  - [ ] vectorIndexType: \"hnsw\" as baseline\n- [ ] Ensure repo has:\n  - [ ] JSON schema file\n  - [ ] \"Apply schema\" script (curl or Python)\n- [ ] Test schema application\n- [ ] Document schema versioning strategy\n\n**Done when:**\n- NcChunkV1 schema is locked and versioned\n- Schema file exists in repo\n- Apply script exists and is tested",
+      "labels": ["area:weaviate", "type:migrations", "priority:high"]
+    },
+    {
+      "milestone": "DB-ML3 – Weaviate / vector schema and indexes",
+      "title": "DB-014: Align Weaviate documentation with reality",
+      "body": "Update DM-003 and DM-005 to accurately reflect Weaviate implementation.\n\n**Tasks:**\n- [ ] Update DM-003:\n  - [ ] Scope updated to \"Weaviate 1.34+ multi-tenant\"\n  - [ ] \"Index types supported\" section present and accurate\n  - [ ] Multi-tenant configuration documented\n- [ ] Update DM-005:\n  - [ ] §8.10 spells out class versioning\n  - [ ] Index-type change process documented (NcChunkV{n+1} dual-write, benchmarks, DR updates)\n- [ ] Review for consistency\n\n**Done when:**\n- DM-003 and DM-005 fully describe how Weaviate is used and governed\n- Documentation matches implementation",
+      "labels": ["area:weaviate", "type:docs", "priority:high"]
+    },
+    {
+      "milestone": "DB-ML3 – Weaviate / vector schema and indexes",
+      "title": "DB-015: Create Weaviate dev environment setup",
+      "body": "Build local development environment for Weaviate.\n\n**Tasks:**\n- [ ] Add docker-compose.weaviate.dev.yml to the repo:\n  - [ ] Weaviate 1.34 container\n  - [ ] Persistent volume configuration\n  - [ ] Basic config\n- [ ] Add Makefile helpers:\n  - [ ] make weaviate_up\n  - [ ] make weaviate_down\n- [ ] Document setup in README or dev docs\n- [ ] Test environment setup\n\n**Done when:**\n- New developer can run make weaviate_up successfully\n- Weaviate container runs with correct version and config\n- Setup is documented",
+      "labels": ["area:weaviate", "type:dev-environment", "priority:medium"]
+    },
+    {
+      "milestone": "DB-ML3 – Weaviate / vector schema and indexes",
+      "title": "DB-016: Build schema apply and smoke test scripts",
+      "body": "Create automation for schema application and basic validation.\n\n**Tasks:**\n- [ ] Create script to:\n  - [ ] Start Weaviate dev container\n  - [ ] Apply NcChunkV1 schema\n  - [ ] Insert a few chunks for account_id = test_account\n  - [ ] Query back to ensure multi-tenant isolation works\n- [ ] Document script usage\n- [ ] Integrate into smoke test suite\n- [ ] Add to CI if appropriate\n\n**Done when:**\n- Script exists and is documented (scripts/apply_weaviate_schema.sh or similar)\n- Smoke test validates multi-tenant isolation\n- New developer can run full test successfully",
+      "labels": ["area:weaviate", "type:testing", "priority:high"]
+    },
+    {
+      "milestone": "DB-ML4 – Cross-store contracts and lineage",
+      "title": "DB-017: Create data contract specification (DCON-001)",
+      "body": "Define comprehensive data contracts for all major entities and events.\n\n**Tasks:**\n- [ ] For each major entity and event:\n  - [ ] Define field types and constraints\n  - [ ] Define how it appears in:\n    - [ ] nc.* (OLTP)\n    - [ ] Lake/Iceberg (analytics)\n    - [ ] Weaviate (if applicable)\n- [ ] Document contract specifications\n- [ ] Create validation rules\n- [ ] Align with existing DCON-001 if it exists\n\n**Done when:**\n- DCON-001 exists and covers all major entities\n- Each entity has clear contract definition across all stores",
+      "labels": ["area:data-contracts", "type:docs", "priority:high"]
+    },
+    {
+      "milestone": "DB-ML4 – Cross-store contracts and lineage",
+      "title": "DB-018: Build lineage mapping documentation (LIN-001)",
+      "body": "Create comprehensive data lineage documentation.\n\n**Tasks:**\n- [ ] Draw lineage per domain:\n  - [ ] Ingestion → nc.raw_* → nc.chunk → NcChunkV1 → analytics tables\n  - [ ] Scan → nc.scan → nc.finding → nc.ticket / nc.remediation → lake\n- [ ] Create lineage diagrams\n- [ ] Document lineage in LIN-001 or similar document\n- [ ] Link to related documents (DM-003, DM-005, LAK-001)\n\n**Done when:**\n- LIN-001 exists with clear lineage for all major data flows\n- Diagrams are created and documented\n- Lineage is traceable from source to all destinations",
+      "labels": ["area:lineage", "type:docs", "priority:high"]
+    },
+    {
+      "milestone": "DB-ML4 – Cross-store contracts and lineage",
+      "title": "DB-019: Implement consistency checks across stores",
+      "body": "Build automated consistency validation across data stores.\n\n**Tasks:**\n- [ ] Create script-level sanity checks:\n  - [ ] For a test account, count of findings in OLTP vs lake vs Weaviate should align\n  - [ ] Validate data freshness across stores\n  - [ ] Check referential integrity where applicable\n- [ ] Document consistency rules and SLAs\n- [ ] Add to smoke test suite\n- [ ] Create alerting for consistency violations\n\n**Done when:**\n- For any entity (e.g., finding), can answer:\n  - Where is source of truth?\n  - Where are copies/derivatives stored?\n  - How do we know they're in sync?\n- Automated checks exist and run regularly",
+      "labels": ["area:data-quality", "type:testing", "priority:medium"]
+    },
+    {
+      "milestone": "DB-ML5 – DR, performance, and capacity for the DB layer",
+      "title": "DB-020: Align DR-001 for all database stores",
+      "body": "Extend DR-001 to cover all database and storage systems.\n\n**Tasks:**\n- [ ] Document backup strategy for:\n  - [ ] Postgres (nc_dev equivalent in prod)\n  - [ ] Weaviate (snapshots, export)\n  - [ ] Lake / Iceberg catalog\n- [ ] Define RPO/RTO for each store\n- [ ] Document restore procedures\n- [ ] Create backup automation or procedures\n- [ ] Test backup and restore procedures\n\n**Done when:**\n- DR-001 mentions Postgres, Weaviate, and lake explicitly\n- Backup/restore mechanics are documented\n- RPO/RTO targets are defined",
+      "labels": ["area:dr", "type:docs", "priority:high"]
+    },
+    {
+      "milestone": "DB-ML5 – DR, performance, and capacity for the DB layer",
+      "title": "DB-021: Establish performance baselines and SLOs",
+      "body": "Define and measure performance baselines for database operations.\n\n**Tasks:**\n- [ ] Define key queries:\n  - [ ] Dashboard queries for findings, scans, tickets\n  - [ ] Search queries in Weaviate\n  - [ ] Analytics queries in lake\n- [ ] On dev environment:\n  - [ ] Run simple load tests or query timing at small scale\n  - [ ] Measure baseline performance\n- [ ] Set preliminary SLOs:\n  - [ ] P95 response times for critical queries\n  - [ ] Throughput targets\n  - [ ] Concurrent user capacity\n- [ ] Document in performance docs\n\n**Done when:**\n- Key queries are identified and documented\n- Performance baselines are measured and documented\n- SLOs are defined",
+      "labels": ["area:performance", "type:docs", "priority:medium"]
+    },
+    {
+      "milestone": "DB-ML5 – DR, performance, and capacity for the DB layer",
+      "title": "DB-022: Create capacity model (CAP-001)",
+      "body": "Build capacity planning model for database layer.\n\n**Tasks:**\n- [ ] Very rough sizing:\n  - [ ] Expected rows/day for each big table (finding, audit_log, event)\n  - [ ] Expected GB/day in lake\n  - [ ] Expected vectors/day in Weaviate\n- [ ] Growth assumptions and projections\n- [ ] Define what triggers scaling changes\n- [ ] Document in CAP-001 or equivalent\n- [ ] Create monitoring dashboards for capacity metrics\n\n**Done when:**\n- CAP-001 (or equivalent sections) mentions all stores explicitly\n- Rough understanding of:\n  - Growth rates\n  - Scaling triggers\n  - Capacity limits",
+      "labels": ["area:capacity", "type:docs", "priority:medium"]
+    }
+  ]
+}
