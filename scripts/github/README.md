@@ -31,7 +31,9 @@ Database layer is not only designed but also operable: DR, performance targets, 
 
 ## Usage
 
-### Prerequisites
+### Option 1: Automated Creation (Recommended)
+
+**Prerequisites:**
 
 1. Install the GitHub CLI (`gh`):
    ```bash
@@ -47,11 +49,15 @@ Database layer is not only designed but also operable: DR, performance targets, 
    gh auth login
    ```
 
-### Creating Milestones and Issues
+   Or set the `GH_TOKEN` environment variable:
+   ```bash
+   export GH_TOKEN=your_github_token_here
+   ```
 
-Run the Python script to create all milestones and issues:
+**Run the script:**
 
 ```bash
+cd /path/to/neurocipher-data-pipeline
 python scripts/github/create_milestones_and_issues.py
 ```
 
@@ -62,10 +68,12 @@ The script will:
 4. Apply labels to issues (only if the labels already exist in the repository)
 5. Print a summary of created milestones and issues
 
-### Manual Creation
+### Option 2: Manual Creation
 
-If you prefer to create milestones and issues manually, refer to the `milestones_and_issues.json` file for the complete specification including:
-- Milestone titles and descriptions
+If you cannot run the automated script (e.g., due to permissions or authentication), see the `MANUAL_GUIDE.md` file for step-by-step instructions on creating milestones and issues manually.
+
+The `milestones_and_issues.json` file contains the complete specification including:
+- Milestone titles and descriptions  
 - Issue titles, bodies (with task checklists), and labels
 - Milestone assignments for each issue
 
