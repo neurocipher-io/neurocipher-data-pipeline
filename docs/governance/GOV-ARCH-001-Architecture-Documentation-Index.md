@@ -102,7 +102,7 @@ The following sections enumerate each family with path, status, and tier.
 |--------------|-----------------------------------|----------------------------------------------------------------------|---------------------|-------|-----------------------------------|
 | REF-001      | Glossary and Standards Catalog    | `docs/governance/REF-001-Glossary-and-Standards-Catalog.md`         | Existing            | 1     | Canonical naming and style rules. |
 | REF-002      | Platform Constants                | `docs/governance/REF-002-Platform-Constants.md`                     | Existing            | 1     | Canonical identifiers and constants. |
-| GOV-DEC-001  | Decision Governance               | `docs/governance/GOV-DEC-001-Decision-Governance.md`                | Existing            | 2     | Decision and approval process.    |
+| GOV-DEC-001  | Decision Governance               | `docs/governance/GOV-DEC-001-Decision-Governance.md`                | Planned             | 2     | Decision and approval process.    |
 | GOV-ARCH-001 | Architecture Documentation Index  | `docs/governance/GOV-ARCH-001-Architecture-Documentation-Index.md`  | Existing (this doc) | 1     | Index for all architecture docs.  |
 
 ## 6. Product documentation
@@ -124,8 +124,8 @@ The following sections enumerate each family with path, status, and tier.
 | AH-002       | AuditHound Architecture and Integration     | `docs/architecture/AH-002-AuditHound-Architecture-and-Integration.md` | Planned | 2  | Technical architecture and dependencies.                   |
 | AF-001       | Agent Forge Orchestration Engine Architecture | `docs/architecture/AF-001-Agent-Forge-Orchestration-Engine-Architecture.md` | Planned | 2 | Task orchestration, state machine, safety.                 |
 | MCP-ARCH-001 | MCP Server Architecture                     | `docs/architecture/MCP-ARCH-001-MCP-Server-Architecture.md`         | Planned | 3     | High-level architecture for MCP server.                    |
-| MCP-TASK-001 | MCP Task Specification                      | `docs/architecture/MCP-TASK-001-Task-Specification.md`              | Existing| 2     | Defines MCP task model and lifecycle.                      |
-| MCP-LEDGER-001 | MCP Ledger Specification                  | `docs/architecture/MCP-LEDGER-001-Ledger-Specification.md`          | Existing| 2     | Defines MCP decision and task ledger format.               |
+| MCP-TASK-001 | MCP Task Specification                      | `docs/architecture/MCP-TASK-001-Task-Specification.md`              | Planned | 2     | Defines MCP task model and lifecycle.                      |
+| MCP-LEDGER-001 | MCP Ledger Specification                  | `docs/architecture/MCP-LEDGER-001-Ledger-Specification.md`          | Planned | 2     | Defines MCP decision and task ledger format.               |
 | —            | System Architecture Blueprint               | `docs/architecture/System-Architecture-Blueprint.md`                | Existing| 1     | High-level blueprint referenced by ARC-001.                |
 | —            | Data Pipeline Architecture                  | `docs/architecture/Data-Pipeline-Architecture.md`                   | Existing| 1     | Detailed data pipeline architecture.                       |
 
