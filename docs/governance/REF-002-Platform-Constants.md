@@ -1,8 +1,11 @@
+id: REF-002
+title: Platform Constants
+owner: Platform Architecture
+status: Draft
+last_reviewed: 2025-11-10
+
 # REF-002 Platform Constants
 
-**Owner:** Platform Architecture  
-**Status:** Draft  
-**Last reviewed:** 2025-11-10  
 **Purpose:** Canonical reference for identifiers shared across docs, infrastructure, and services.
 
 ## Environments

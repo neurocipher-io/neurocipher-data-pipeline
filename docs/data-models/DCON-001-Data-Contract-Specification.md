@@ -1,292 +1,705 @@
-Status: Tier-1 Stub  
-Owner: Data Architecture  
-Approvers: Architecture Board, Data Engineering Lead  
-Last updated: 2025-11-26  
-Applies to: All inter-service communication, libs/python/nc_models/  
-Related: DM-003, DM-005, SRG-001, DPS-ING-001, DPS-NORM-001, REF-001, REF-002
+id: DCON-001
+title: Data Contract Specification
+owner: Data Architecture
+status: For Board Review
+last_reviewed: 2025-11-06
 
------
+DCON-001 — Data Contract Specification
 
-## 1. Purpose
+  
 
-This document defines the rules, formats, and compatibility guarantees for data
-contracts across the Neurocipher platform.
+  
 
-It exists to:
+Status: For Board Review
 
-- Establish a single source of truth for shared data structures.
-- Define versioning and backward compatibility requirements.
-- Specify where canonical models live (`libs/python/nc_models/`).
-- Prevent services from defining conflicting schemas.
+Owner: Data Architecture
 
------
+Applies to: Neurocipher Data Pipeline (see docs/integrations/)
 
-## 2. Scope
+Last Updated: 2025-11-06
 
-This document covers:
+Region: ca-central-1
 
-- Canonical data contract definitions (Finding, Asset, Identity, Event).
-- Versioning strategy for contracts.
-- Backward and forward compatibility rules.
-- Validation and enforcement mechanisms.
-- Location of canonical Pydantic models.
+  
 
-This document does not cover:
+  
 
-- Physical storage schemas (see DM-003).
-- Wire protocol specifics (see openapi.yaml per service).
-- Schema registry implementation (see SRG-001).
+  
 
------
+  
 
-## 3. References
+1. Purpose
 
-- REF-001 Glossary and Standards Catalog (§4 Naming, §8 Data Classification, §11 Events)
-- REF-002 Platform Constants
-- DM-003 Physical Schemas and Storage Map
-- DM-005 Governance, Versioning, and Migrations
+  
 
------
+  
 
-## 4. Canonical model location
+Define the normative data-contract framework that all producers and consumers must follow across events, files, tables, feature vectors, and public APIs. Contracts standardize schemas, versioning, compatibility, validation, provenance, and lifecycle so changes ship safely with auditability and zero ambiguous behavior. 
 
-All shared data models must be defined in:
+  
 
-```
-libs/python/nc_models/
-  src/
-    nc_models/
-      __init__.py
-      finding.py          # SecurityFinding, FindingSeverity
-      asset.py            # CloudAsset, AssetType
-      identity.py         # CloudIdentity, Principal
-      event.py            # SecurityEvent, EventSource
-      compliance.py       # ComplianceControl, Framework
-      remediation.py      # RemediationAction, PlaybookStep
-      common.py           # Shared enums, base classes
-      _version.py         # Contract version metadata
-```
+  
 
-Services must import from `nc_models`. Services must not define their own
-versions of these core types.
+2. Scope
 
-Package naming follows REF-001 §4.2: `org_service` in snake_case.
+  
 
------
+  
 
-## 5. Core data contracts
+In scope: event payloads, S3 file layouts, Iceberg table specs, Weaviate classes, and OpenAPI surfaces. Includes registry integration, lifecycle states, IAM and encryption rules, observability, and runbooks. Out of scope: UI view models. 
 
-|Contract           |Description                              |Key Fields                                       |Status |
-|-------------------|-----------------------------------------|-------------------------------------------------|-------|
-|`SecurityFinding`  |A detected security issue                |id, severity, resource_id, detection_time, source|Defined|
-|`CloudAsset`       |A cloud resource being monitored         |arn_or_uri, provider, asset_type, region, tags   |Defined|
-|`CloudIdentity`    |A principal (user, role, service account)|id, provider, identity_type, permissions         |Planned|
-|`SecurityEvent`    |An audit or activity event               |id, timestamp, actor, action, resource           |Planned|
-|`ComplianceControl`|A control from a framework               |id, framework, requirement, status               |Planned|
-|`RemediationAction`|An action taken or recommended           |id, finding_id, action_type, status              |Planned|
+  
 
------
+  
 
-## 6. Naming conventions (per REF-001 §4)
+3. References
 
-|Element     |Convention                   |Example                               |
-|------------|-----------------------------|--------------------------------------|
-|JSON fields |snake_case                   |`resource_id`, `detection_time`       |
-|Primary keys|UUIDv7                       |`018fa0b8-6cde-7d2a-bd7f-8d9a3f6f1d0a`|
-|Timestamps  |ISO 8601 with Z suffix       |`2025-11-26T18:00:00Z`                |
-|Enums       |UPPER_SNAKE_CASE             |`CRITICAL`, `AWS_GUARDDUTY`           |
-|Event names |domain.service.event.v{major}|`security.finding.created.v1`         |
+  
 
------
+  
 
-## 7. Versioning strategy
+- SRG-001 Schema Registry (authoritative storage, APIs, and lifecycle)  
+- DM-004 Event Schemas & Contracts (envelope, validation, compatibility)  
+- DM-005 Governance, Versioning & Migrations (process, gates, deprecation windows)  
+- CI/CL-001..003 (CI gates, delivery, change control)      
+- OBS-001..003 (telemetry, dashboards, SLOs, incident process)      
 
-### 7.1 Semantic versioning
+  
 
-Contracts follow SemVer: `MAJOR.MINOR.PATCH`
+  
 
-- MAJOR: Breaking changes (field removal, type change, required field added).
-- MINOR: Backward compatible additions (new optional field).
-- PATCH: Documentation, bug fixes, no schema change.
+  
 
-### 7.2 Current version
+4. Definitions
 
-```python
-# libs/python/nc_models/src/nc_models/_version.py
-CONTRACT_VERSION = "0.1.0"
-```
+  
 
-### 7.3 Version in messages
+  
 
-All serialized messages must include a `contract_version` field:
+- Schema URN: urn:nc:schema:{namespace}:{name}:{kind} where namespace={domain}.{subdomain}, name=snake_case, kind ∈ {event|file|table|feature|api}. Regex in SRG-001.  
+- Version: SemVer MAJOR.MINOR.PATCH for schema documents. Contract compatibility defined by mode.  
+- Compatibility Modes: backward|forward|full|none with allowed change matrix.  
+- Lifecycle: draft → active → deprecated → retired.  
+
+  
+
+  
+
+  
+
+5. Normative Requirements
+
+  
+
+  
+
+6. Every ingested record must carry a valid {schema_urn, version}; ingress rejects noncompliant payloads.  
+7. Compatibility mode must be declared per stream/table and enforced on publish and read.  
+8. All schema blobs are immutable, content-addressed by SHA-256, and signed with KMS.  
+9. Provenance is recorded for every version: {repo_url, commit_sha, change_ticket, build_id}.  
+10. Access decisions use ABAC tags: nc:tenant, nc:region, nc:classification.  
+
+  
+
+  
+
+  
+
+11. Contract Types
+
+  
+
+  
+
+  
+
+6.1 Event Contracts
+
+  
+
+  
+
+- Envelope: Events share a canonical envelope; detail carries domain payload. Required fields include ULID id, account_id, type, schema_version, event_version, timestamps, trace_id, checksum.  
+- Registry Layout: s3://nc-<env>-schema/events/{type}/v{schema_version}/schema.json (+ examples).  
+- Compatibility: Additive optional fields with defaults are backward compatible; renames/removals are breaking; event_version increments when business meaning changes without schema break.  
+- Validation: Publishers validate before emit; consumers validate and reject to DLQ if invalid.  
+
+**Example – canonical event envelope**
 
 ```json
 {
-  "contract_version": "0.1.0",
-  "id": "018fa0b8-6cde-7d2a-bd7f-8d9a3f6f1d0a",
-  "severity": "HIGH"
+  "id": "01JB0GQW0A8Z7HQ8PRJ9TB9X1Z",
+  "source": "nc.app",
+  "account_id": "01HZX7K3M4A7W0E3V6S8R2N8C1",
+  "type": "finding.created",
+  "schema_version": 1,
+  "event_version": 1,
+  "occurred_at": "2025-10-28T14:05:23.412Z",
+  "emitted_at": "2025-10-28T14:05:23.980Z",
+  "trace_id": "f2b67f2a0d324c8c9a0a8c2a3b1caa21",
+  "actor": { "type": "SYSTEM" },
+  "checksum_sha256": "e0c9035898dd52fc65c41454cec9c4d2611bfb37b53a5e0e86c7cd9f7d2c2f3a",
+  "detail": { /* type-specific payload fields (see DM-004) */ }
 }
 ```
 
------
+  
 
-## 8. Compatibility rules
+  
 
-|Change Type         |Allowed      |Migration Required  |
-|--------------------|-------------|--------------------|
-|Add optional field  |Yes          |No                  |
-|Add required field  |No (breaking)|Yes, MAJOR bump     |
-|Remove field        |No (breaking)|Yes, MAJOR bump     |
-|Rename field        |No (breaking)|Yes, MAJOR bump     |
-|Change field type   |No (breaking)|Yes, MAJOR bump     |
-|Add enum value      |Yes          |No                  |
-|Remove enum value   |No (breaking)|Yes, MAJOR bump     |
-|Change default value|Careful      |Depends on consumers|
+  
 
-Per REF-001 §5: Support N and N-1 versions at minimum.
+6.2 File Contracts (S3)
 
------
+  
 
-## 9. Event envelope (per REF-001 §11)
+  
 
-All events use CloudEvents 1.0:
+- Kinds: file schemas describe normalized file layouts and metadata for ingestion buckets.
+- Storage Layout: Stored in SRG with URN and SemVer under schemas/{namespace}/{name}/file/vX.Y.Z/schema.json.  
+- Required Meta: checksum_sha256, mime, pii_flags, policy, timestamps, as recorded in the Postgres metadata tables (contract links to DM-003).  
+
+**Example – normalized S3 layout**
 
 ```json
 {
-  "id": "018fa0b8-6cde-7d2a-bd7f-8d9a3f6f1d0a",
-  "source": "svc.security.finding",
-  "type": "security.finding.created.v1",
-  "specversion": "1.0",
-  "time": "2025-11-26T18:00:00Z",
-  "datacontenttype": "application/json",
-  "data": {
-    "finding_id": "018fa0b8-6cde-7d2a-bd7f-8d9a3f6f1d0a",
-    "tenant_id": "tenant_abc123",
-    "severity": "HIGH",
-    "resource_id": "arn:aws:s3:::my-bucket"
+  "bucket": "nc-prod-data",
+  "key": "01HZX7K3M4A7W0E3V6S8R2N8C1/document_chunk/2025/10/28/01JB0GQW0A8Z7HQ8PRJ9TB9X1Z.jsonl",
+  "schema_urn": "urn:nc:schema:ingest.normalized:document_chunk:file",
+  "checksum_sha256": "sha256:abc123...",
+  "pii_flags": ["email", "name"],
+  "retention_class": "RC2"
+}
+```
+
+  
+
+  
+
+  
+
+6.3 Table Contracts (Iceberg)
+
+  
+
+  
+
+- Format: format=iceberg schema documents define columns, partition spec, sort order, primary keys, and null policy. Validated by the registry’s table validator.  
+- Compatibility: Tables default to full compatibility; no removal of columns or key changes without major version and cutover plan.  
+
+  
+
+  
+
+  
+
+6.4 Feature Vector Contracts
+
+  
+
+  
+
+- Class Naming: Weaviate classes versioned as NcChunkV{n} for incompatible vector layouts.  
+- Compatibility: New class per incompatible change; dual-read window during cutover governed by DM-005.  
+
+  
+
+  
+
+  
+
+6.5 API Contracts
+
+  
+
+  
+
+- Format: format=openapi for public service surfaces. Changes follow compatibility_mode=none unless explicitly relaxed; clients pin exact versions.  
+
+6.6 Data classification & masking
+
+
+- All API and event contracts must declare the classification level (P0–P3) per `docs/governance/REF-001-Glossary-and-Standards-Catalog.md §8`. Normalized payloads record `pii_flags`, and the DQ-001 mask rules determine whether hashing, tokenization, or rejection is required.
+- Detection hinges on Macie, regex, and ADOT processors while logs drop raw P1/P2 values unless hashed to satisfy OBS-001/OBS-002 telemetry requirements.
+- Acceptance criteria must cite the classification table and prove masking automation before decks move to REL-002 reviews.
+
+  
+
+  
+
+  
+
+6.6 Security Events and Commands
+
+- Event URNs follow `urn:nc:schema:security:{domain}:{name}.v1` and live under `schemas/events/`.
+- Findings: `event.security.finding.v1` emits policy violations (PII, malware, exfil). Required fields: `finding_id`, `severity`, `classification`, `policy_id`, `resource`, `tenant_id`, `trace_id`, `evidence`.
+- Anomalies: `event.security.anomaly.v1` emits heuristic signals with `score`, `signal_type`, `context`.
+- Commands: Security Engine generates `cmd.security.quarantine.v1`, `cmd.security.ticket.create.v1`, and `cmd.security.notify.v1`. Each includes `action_id`, TTL guidance, and optional notification metadata.
+- Callbacks: Neurocipher emits `event.security.action_status.v1` for every state transition. Retries must use unique `status_id` values and set `retriable` accordingly.
+- PII policy: Finding payloads must populate `classification` and `evidence.pii_types` when sensitive data is present. Sensitive fields are tokenized per DM-005 before leaving the pipeline.
+
+**Example – event.security.finding.v1**
+
+```json
+{
+  "schema_urn": "urn:nc:schema:security:finding:event.security.finding.v1",
+  "finding_id": "fin_01J0ABC7Z9M5P6Q7R8S9",
+  "severity": "high",
+  "classification": ["pii", "exfil-risk"],
+  "detected_at": "2025-01-20T12:45:13Z",
+  "resource": {
+    "type": "s3_object",
+    "arn": "arn:aws:s3:::nc-dp-raw/sourceA/2025/01/20/doc-123.bin"
+  },
+  "policy_id": "POL-PII-007",
+  "tenant_id": "tn_01HZY3",
+  "trace_id": "01J0AEH4M4Z9N3QX7TB6",
+  "evidence": {
+    "checksum": "sha256:abc...",
+    "pii_types": ["ssn", "dob"]
+  },
+  "metadata": {
+    "pipeline_stage": "normalize",
+    "source": "ingest.webhook"
   }
 }
 ```
 
------
+**Example – cmd.security.quarantine.v1**
 
-## 10. Example: SecurityFinding contract
-
-```python
-# libs/python/nc_models/src/nc_models/finding.py
-
-from datetime import datetime
-from enum import Enum
-from typing import Optional, List
-from pydantic import BaseModel, Field
-import uuid
-
-class FindingSeverity(str, Enum):
-    CRITICAL = "CRITICAL"
-    HIGH = "HIGH"
-    MEDIUM = "MEDIUM"
-    LOW = "LOW"
-    INFO = "INFO"
-
-class FindingSource(str, Enum):
-    AWS_CONFIG = "AWS_CONFIG"
-    AWS_GUARDDUTY = "AWS_GUARDDUTY"
-    AWS_SECURITY_HUB = "AWS_SECURITY_HUB"
-    GCP_SCC = "GCP_SCC"
-    AZURE_DEFENDER = "AZURE_DEFENDER"
-    NEUROCIPHER_DETECTION = "NEUROCIPHER_DETECTION"
-
-class SecurityFinding(BaseModel):
-    """Canonical security finding contract."""
-    
-    contract_version: str = "0.1.0"
-    
-    id: str = Field(
-        default_factory=lambda: str(uuid.uuid7()),
-        description="UUIDv7 finding identifier"
-    )
-    tenant_id: str = Field(..., description="Tenant this finding belongs to")
-    severity: FindingSeverity
-    source: FindingSource
-    resource_id: str = Field(..., description="ARN or URI of affected resource")
-    resource_type: str
-    region: Optional[str] = None
-    detection_time: datetime = Field(..., description="ISO 8601 with Z suffix")
-    title: str
-    description: str
-    recommendation: Optional[str] = None
-    compliance_mappings: List[str] = Field(default_factory=list)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
-    
-    class Config:
-        use_enum_values = True
-        json_encoders = {
-            datetime: lambda v: v.strftime("%Y-%m-%dT%H:%M:%SZ")
-        }
+```json
+{
+  "schema_urn": "urn:nc:schema:security:command:cmd.security.quarantine.v1",
+  "action_id": "act_01J0AH1VB5M2R4S6T8",
+  "target": {
+    "type": "document",
+    "id": "doc_01HXYT"
+  },
+  "requested_by": "seg_automation",
+  "requested_at": "2025-01-20T12:46:02Z",
+  "reason": "PII policy POL-PII-007 violation",
+  "ttl_seconds": 3600,
+  "notify": ["sec-ops@neurocipher.io"]
+}
 ```
 
------
+**Example – event.security.action_status.v1**
 
-## 11. PII handling (per REF-001 §8.1)
+```json
+{
+  "schema_urn": "urn:nc:schema:security:status:event.security.action_status.v1",
+  "action_id": "act_01J0AH1VB5M2R4S6T8",
+  "status_id": "ast_01J0AHGDX5R3S6T9",
+  "status": "succeeded",
+  "observed_at": "2025-01-20T12:46:20Z",
+  "details": {
+    "message": "Document quarantined and downstream copies flagged",
+    "duration_ms": 18000
+  },
+  "retriable": false,
+  "trace_id": "01J0AEH4M4Z9N3QX7TB6"
+}
+```
 
-Contracts must respect PII tiers:
+7. Identification and Naming
 
-|Field Type         |PII Level|Handling                       |
-|-------------------|---------|-------------------------------|
-|`resource_id` (ARN)|P3       |Allowed raw                    |
-|`user_email`       |P2       |Pseudonymize or hash           |
-|`credentials`      |P0       |Never persist, reject ingestion|
+  
 
-Detection and redaction automation per REF-001 §8.2 applies to all payloads.
+  
 
------
+- Namespaces: {domain}.{subdomain} e.g., security.auth, billing.invoice.  
+- Schema URN: urn:nc:schema:{namespace}:{name}:{kind}; regex and examples in SRG-001.  
 
-## 12. Validation and enforcement
+  
 
-### 12.1 Build time validation
+  
 
-- All services importing `nc_models` get Pydantic validation automatically.
-- CI pipeline runs schema compatibility checks on PR.
+  
 
-### 12.2 Runtime validation
+8. Versioning and Compatibility
 
-- Ingest service validates incoming data against contracts.
-- Invalid payloads route to dead letter queue with validation errors.
-- Errors follow RFC 7807 Problem Details (REF-001 §10.2).
+  
 
-### 12.3 Contract testing
+  
 
-- Each service that produces or consumes a contract must have contract tests.
-- Tests verify serialization and deserialization round trips.
+- SemVer Rules: Patch = safe metadata changes only; Minor = additive fields with defaults; Major = breaking.  
+- Modes:  
+    
 
------
+- backward default for events.
+- full default for tables.
+- none default for APIs.  
+    Allowed changes per matrix in SRG-001.  
 
-## 13. Acceptance criteria
+-   
+    
+- Deprecation Windows: Minimum two releases for soft-breaking changes with dual emit/read.  
 
-This document is complete when:
+  
 
-- [ ] All core contracts are defined with field level documentation.
-- [ ] Versioning strategy is approved by Architecture Board.
-- [ ] `libs/python/nc_models/` structure is created.
-- [ ] SecurityFinding and CloudAsset are fully implemented.
-- [ ] Contract tests exist for all defined contracts.
-- [ ] CI enforces backward compatibility checks.
-- [ ] Event envelope matches CloudEvents 1.0 (REF-001 §11).
-- [ ] PII handling aligns with REF-001 §8.1.
+  
 
------
+  
 
-## 14. Open questions
+9. Validation, Test Vectors, and CI Gates
 
-- [ ] Use Avro or Protobuf for wire format, or keep JSON only (per REF-001 §10.1)?
-- [ ] Define contract deprecation sunset period.
-- [ ] Confirm schema registry service (SRG-001) scope for runtime validation.
+  
 
------
+  
 
-## 15. Revision history
+- Supported Formats: JSON Schema 2020-12, Avro 1.11, Protobuf 3, Iceberg 1.4, OpenAPI 3.1. Required checks include syntax, types, defaults, enums, PK/partition presence, and semantic guards from DM-001.  
+- Test Vectors: Producers must supply minimal and maximal payload sets; stored under attachments/{schema_id}/tests/v{semver}/.  
+- CI/CL Enforcement: Contract tests run on PRs; registry presence and checksums validated; event contracts verified against JSON Schemas; Weaviate class diffs dry-run; failures block merges.  
 
-|Date      |Author           |Change             |
-|----------|-----------------|-------------------|
-|2025-11-26|Data Architecture|Initial Tier-1 stub|
+  
+
+  
+
+  
+
+10. Registry Integration
+
+  
+
+  
+
+- Authoritative Store: S3 versioned bucket with object lock; metadata in DynamoDB indices; CMS signature and SHA-256 digest stored with blobs.  
+- Entities: Schema, Version, AuditEvent with provenance and validation matrix.  
+- Lifecycle Flow: Propose → Validate → Approve → Publish → Promote → Deprecate → Retire, with EventBridge lifecycle events.  
+
+  
+
+  
+
+  
+
+11. Error Model
+
+  
+
+  
+
+Services return RFC-7807 Problem JSON for validation failures; include invalid_params detailing specific schema violations. 
+
+  
+
+  
+
+12. Security and IAM
+
+  
+
+  
+
+- ABAC: nc:tenant, nc:region, nc:classification tags drive access to read/write endpoints. Producers are restricted to owned namespaces; admins manage activation, deprecation, retirement, and rollback.  
+- Encryption: S3 SSE-KMS per tenant; signer uses dedicated CMK rotated every 12 months; previous keys retained for verification.  
+
+  
+
+  
+
+  
+
+13. Performance and SLOs
+
+  
+
+  
+
+- Read API availability ≥ 99.95%. p95 read of GET /schemas/{id}/versions/{v} ≤ 20 ms, p99 ≤ 50 ms. Throughput ≥ 2k reads/s and 50 writes/s per region. Provisioned concurrency on hot read paths.  
+- Registry p99 lookup latency for active versions ≤ 50 ms. Faulty version deactivation ≤ 5 minutes via admin API.  
+
+  
+
+  
+
+  
+
+14. Observability
+
+  
+
+  
+
+- Metrics: registry.read.latency_ms p50/p95/p99, read/write TPS, validation.failures.rate, active version counts, cache hit rate, and Postgres metadata query latency plus connection pool usage.  
+- Dashboards & Alerts: Conform to OBS-001..003 golden signals and burn-rate policies.    
+
+  
+
+  
+
+  
+
+15. Change Governance
+
+  
+
+  
+
+- Process: Proposal with compatibility level, impact, rollout/rollback, backfills, and retention effects; CAB approvals per GOV-002; evidence archived.    
+- Gates: Contract tests, registry checksum validation, vector class diff checks, SLO checks (p95, DLQ depth), and migration lint.    
+
+  
+
+  
+
+  
+
+16. Rollback and Recovery
+
+  
+
+  
+
+- Schema Rollback: Admin :rollback to prior semver, flush caches, verify consumers. Region failover uses DynamoDB global tables and S3 CRR.  
+- Operational Triggers: SLO breach, error-budget burn, or incompatible change detected. Follow incident workflow in OBS-003/REL-002.    
+
+  
+
+  
+
+  
+
+17. Acceptance Criteria
+
+  
+
+  
+
+- 100% of ingested records include valid {schema_urn, version} and pass validation.  
+- All contracts live in SRG with signed digests, provenance, and validation matrix.  
+- CI gates enforce contract tests and checksum presence; failures block merges.  
+- Dashboard shows registry latency, error rates, cache hit rate, and active versions; alerts wired to on-call.  
+- Change requests show approvals and evidence per GOV-002.  
+- Classification compliance checklist references `REF-001 §8` and demonstrates PII masking levels (P1/P2) via DQ-001 masking rules before contracts are promoted.
+
+  
+
+  
+
+  
+
+  
+
+  
+
+Appendix A — Examples
+
+  
+
+  
+
+  
+
+A.1 Event Contract 
+
+$id
+
+ and Envelope
+
+  
+
+{
+
+  "$id": "https://schemas.neurocipher.io/events/finding.created/v1/schema.json",
+
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+
+  "title": "finding.created",
+
+  "type": "object",
+
+  "additionalProperties": false,
+
+  "required": ["id", "account_id", "type", "schema_version", "event_version", "occurred_at", "emitted_at", "trace_id", "detail"],
+
+  "properties": {
+
+    "id": { "type": "string", "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$" },
+
+    "account_id": { "type": "string" },
+
+    "type": { "const": "finding.created" },
+
+    "schema_version": { "const": 1 },
+
+    "event_version": { "const": 1 },
+
+    "occurred_at": { "type": "string", "format": "date-time" },
+
+    "emitted_at": { "type": "string", "format": "date-time" },
+
+    "trace_id": { "type": "string" },
+
+    "checksum_sha256": { "type": "string" },
+
+    "detail": { "$ref": "#/$defs/detail" }
+
+  },
+
+  "$defs": {
+
+    "detail": {
+
+      "type": "object",
+
+      "required": ["id", "asset_urn", "severity", "status"],
+
+      "properties": {
+
+        "id": { "type": "string" },
+
+        "asset_urn": { "type": "string" },
+
+        "severity": { "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"] },
+
+        "status": { "enum": ["OPEN", "IN_PROGRESS", "RESOLVED"] }
+
+      },
+
+      "additionalProperties": false
+
+    }
+
+  }
+
+}
+
+Conforms to the envelope and validation rules in DM-004.   
+
+  
+
+  
+
+A.2 Schema URN and Version Metadata
+
+  
+
+{
+
+  "schema_id": "urn:nc:schema:security.finding:finding_created:event",
+
+  "semver": "1.0.0",
+
+  "compatibility_mode": "backward",
+
+  "blob_uri": "s3://nc-registry-prod-ca-central-1/schemas/security.finding/finding_created/event/v1.0.0/schema.json",
+
+  "digest_sha256": "4d8c...fa",
+
+  "provenance": {
+
+    "repo_url": "https://github.com/neurocipher-io/neurocipher-core",
+
+    "commit_sha": "9c1b3d7",
+
+    "change_ticket": "CHG-20251106-042",
+
+    "build_id": "gh-1234567890"
+
+  },
+
+  "validation_matrix": {
+
+    "required_checks": ["syntax", "types", "defaults", "enum", "primary_key"],
+
+    "optional_checks": ["value_distribution"],
+
+    "test_vectors_uri": "s3://nc-registry-prod-ca-central-1/attachments/urn%3Anc%3Aschema%3Asecurity.finding%3Afinding_created%3Aevent/tests/v1.0.0/"
+
+  }
+
+}
+
+Fields align with SRG-001 Version entity. 
+
+  
+
+  
+
+A.3 Problem JSON on Validation Failure
+
+  
+
+{
+
+  "type": "https://neurocipher.io/problems/validation-error",
+
+  "title": "Validation failed",
+
+  "status": 422,
+
+  "detail": "Field 'severity' is required",
+
+  "invalid_params": [{"name": "severity", "reason": "required"}]
+
+}
+
+Matches SRG-001 error model. 
+
+  
+
+  
+
+  
+
+  
+
+Appendix B — API Surface (Registry excerpts)
+
+  
+
+  
+
+- POST /schemas create schema metadata.
+- POST /schemas/{schema_id}/versions publish version with Idempotency-Key.
+- GET /schemas/{schema_id}/versions/{semver} fetch signed blob metadata.
+- Admin operations: :deprecate, :retire, :rollback, POST /admin/cache:flush.    
+
+  
+
+  
+
+  
+
+  
+
+  
+
+Appendix C — Operational Runbooks
+
+  
+
+  
+
+- Publish new version, hotfix/rollback, deprecate with grace period, cache flush, region failover.  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+Appendix D — Observability Panel Checklist
+
+  
+
+  
+
+Include latency histograms, TPS, validation failure rate, cache hit, Postgres metadata connection saturation, KMS sign latency, and event delivery failures. Wire alerts to on-call per OBS-002/003.   
+
+  
+
+  
+
+  
+
+Compliance note: All documentation uses the term “artifact.” “Artefact” is deprecated. 
+
+  
+
+Ready for board review: This DCON-001 spec binds producers and consumers to SRG-001 and DM-004 rules, enforces CI/CL gates, and defines measurable SLOs and rollback procedures with evidence trails.
