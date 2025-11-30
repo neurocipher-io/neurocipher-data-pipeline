@@ -1,10 +1,12 @@
+---
 id: CAP-001
-title: Capacity and cost model
+title: Capacity and Scalability Model
 owner: Platform SRE
-status: Draft v0.1
+status: Draft
 last_reviewed: 2025-11-20
+---
 
-# CAP-001 Capacity and cost model
+# CAP-001 Capacity and Scalability Model
 
 ## 1. Purpose
 
